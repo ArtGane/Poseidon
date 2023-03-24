@@ -12,7 +12,7 @@ public class RatingDto {
 
     private Integer id;
 
-    @NotBlank(message = "Moody'sRating is mandatory")
+    @NotBlank(message = "Moody's Rating is mandatory")
     private String moodysRating;
 
     @NotBlank(message = "SandP's Rating is mandatory")

@@ -38,8 +38,7 @@ public class RatingService {
     public boolean createRating(Rating ratingEntity) throws RatingServiceException {
         if (ratingEntity != null && !ratingRepository.findRatingById(ratingEntity.getId()).isPresent()) {
             ratingRepository.save(ratingEntity);
-            log.info("[RATING] Created a new rating with id '{}' for order number '{}'", ratingEntity.getId(),
-                    ratingEntity.getOrderNumber());
+            log.info("[RATING] Created a new rating with id " + ratingEntity.getId() + " for order number " + ratingEntity.getOrderNumber());
             return true;
         }
         throw new RatingServiceException("There was an error while creating the rating");
@@ -51,8 +50,7 @@ public class RatingService {
             ratingEntityUpdated.setId(id);
             ratingRepository.save(ratingEntityUpdated);
 
-            log.info("[RATING] Updated rating's id '{}' for order number '{}'", ratingEntityUpdated.getId(),
-                    ratingEntityUpdated.getOrderNumber());
+            log.info("[RATING] Updated rating's id " + ratingEntityUpdated.getId() + " for order number " + ratingEntityUpdated.getOrderNumber());
             return true;
         }
         throw new RatingServiceException("Could not find rating with id : " + id);
@@ -62,8 +60,7 @@ public class RatingService {
         Optional<Rating> rating = ratingRepository.findRatingById(id);
         if (id != null && rating.isPresent()) {
             ratingRepository.delete(rating.get());
-            log.info("[RATING] Deleted rating's id '{}' for order number '{}'", id,
-                    rating.get().getOrderNumber());
+            log.info("[RATING] Deleted rating's id " + id + " for order number " + rating.get().getOrderNumber());
             return true;
         }
         throw new RatingServiceException("Could not find rating with id : " + id);

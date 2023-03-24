@@ -1,5 +1,6 @@
 package com.poseidon.api.service;
 
+import com.poseidon.api.constantes.UserConstantes;
 import com.poseidon.api.model.User;
 import com.poseidon.api.model.dto.UserDto;
 import com.poseidon.api.repositories.UserRepository;
@@ -13,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -27,12 +29,13 @@ public class UserService implements UserDetailsService {
     @Autowired
     ModelMapper modelMapper;
 
+
     /**
-     * Spring Security implemented method
-     * Allows user connection by using the username provided
+     * Charge un utilisateur à partir de son nom d'utilisateur et retourne une instance UserDetails représentant cet utilisateur.
      *
-     * @param username							The username that tries to connect to the application
-     * @throws UsernameNotFoundException		If the username doesn't exist in database
+     * @param username le nom d'utilisateur à rechercher
+     * @return une instance UserDetails représentant l'utilisateur trouvé
+     * @throws UsernameNotFoundException si l'utilisateur n'est pas trouvé
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -44,87 +47,177 @@ public class UserService implements UserDetailsService {
     }
 
     /**
-     * Get a list of every user registered on the application
+     * Récupère une liste de tous les utilisateurs enregistrés.
      *
-     * @return									List<User> : All existing users
+     * @return la liste de tous les utilisateurs enregistrés
      */
     public List<User> findAllUsers() {
         return userRepository.findAll();
     }
 
     /**
-     * Find a user by its ID
+     * Recherche un utilisateur par son identifiant.
      *
-     * @param userId
-     * @return									 User if it exists in database
+     * @param userId l'identifiant de l'utilisateur à rechercher
+     * @return l'utilisateur trouvé
+     * @throws UsernameNotFoundException si l'utilisateur n'est pas trouvé
      */
     public User findUserById(Long userId) {
-        Optional<User> user = userRepository.findById(userId);
-        if (userId != null && user.isPresent()) {
-            return user.get();
+        Optional<User> user;
+
+        if (userId == null) {
+            throw new UsernameNotFoundException("Could not find user with id : " + userId);
+        } else {
+            user = userRepository.findById(userId);
         }
-        throw new UsernameNotFoundException("Could not find user with id : " + userId);
+
+        return user.get();
     }
 
     /**
-     * Create a user and persist it into the database
+     * Cette méthode permet de créer un utilisateur à partir d'un objet Optional<User>.
      *
-     * @param userEntity						The user entity we want to create
-     * @return									True if the creation was successful
+     * @param userEntity un objet Optional contenant les informations de l'utilisateur à créer.
+     * @return true si l'utilisateur a été créé avec succès, false sinon.
+     * @throws IllegalArgumentException  si le mot de passe ne respecte pas les contraintes définies.
+     * @throws UsernameNotFoundException si le nom d'utilisateur est déjà pris.
+     * @throws NullPointerException      si l'utilisateur ou certaines de ses propriétés sont nuls.
      */
-    public boolean createUser(User userEntity) {
-        if (userEntity != null && !userRepository.findByUsername(userEntity.getUsername()).isPresent()) {
-            userEntity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
-            userRepository.save(userEntity);
+    public boolean createUser(Optional<User> userEntity) {
 
-            log.info("[SERVICE] New user with username : " + userEntity.getUsername() + " and role " + userEntity.getRole() + " has been created");
-            return true;
+        Objects.requireNonNull(userEntity, "L'utilisateur ne peut pas être null");
+        User user = userEntity.orElseThrow(() -> new UsernameNotFoundException("L'utilisateur ne peut pas être null"));
+
+        String username = user.getUsername();
+        Objects.requireNonNull(username, "Le nom d'utilisateur ne peut pas être null");
+
+        String password = user.getPassword();
+        Objects.requireNonNull(password, "Le mot de passe ne peut pas être null");
+
+        if (passwordConstraints(password)) {
+            throw new IllegalArgumentException("Le mot de passe doit contenir au moins une lettre majuscule, un chiffre et 8 caractères");
         }
-        throw new UsernameNotFoundException("Username is already taken");
+
+        if (userRepository.findByUsername(username).isPresent()) {
+            throw new UsernameNotFoundException(UserConstantes.USERNAME_ALREADY_TAKEN_EXCEPTION_MESSAGE);
+        }
+
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+        log.info(String.format(UserConstantes.USER_CREATED_LOG_MESSAGE, username, user.getRole()));
+
+        return true;
     }
 
     /**
-     * Updates an existing user and persist it into the database
+     * Met à jour un utilisateur dans la base de données.
      *
-     * @param userId
-     * @param userEntityUpdated
-     * @return									True if the update was successful
+     * @param userId            l'identifiant de l'utilisateur à mettre à jour
+     * @param userEntityUpdated l'objet User mis à jour
+     * @return true si la mise à jour a été effectuée avec succès, false sinon
+     * @throws IllegalArgumentException  si le mot de passe ne respecte pas les contraintes de sécurité
+     * @throws UsernameNotFoundException si l'utilisateur à mettre à jour n'a pas été trouvé dans la base de données ou si le nom d'utilisateur est déjà pris par un autre utilisateur
+     * @throws NullPointerException      si l'identifiant de l'utilisateur ou l'objet User mis à jour est null
      */
     public boolean updateUser(Long userId, User userEntityUpdated) {
-        Optional<User> user = userRepository.findById(userId);
-        if (userId != null && user.isPresent()) {
 
-            userEntityUpdated.setId(userId);
-            userEntityUpdated.setPassword(passwordEncoder.encode(userEntityUpdated.getPassword()));
-            userRepository.save(userEntityUpdated);
+        Objects.requireNonNull(userId, "L'identifiant de l'utilisateur ne peut pas être null");
+        Objects.requireNonNull(userEntityUpdated, "L'utilisateur mis à jour ne peut pas être null");
 
-            log.info("[SERVICE] Updated user with username : " + userEntityUpdated.getUsername());
-            return true;
+        String username = userEntityUpdated.getUsername();
+        Objects.requireNonNull(username, "Le nom d'utilisateur ne peut pas être null");
+
+        String password = userEntityUpdated.getPassword();
+        Objects.requireNonNull(password, "Le mot de passe ne peut pas être null");
+
+        if (passwordConstraints(password)) {
+            throw new IllegalArgumentException("Le mot de passe doit contenir au moins une lettre majuscule, un chiffre et 8 caractères");
         }
-        throw new UsernameNotFoundException("Could not find user with id : " + userId);
+
+        Optional<User> existingUser = userRepository.findById(userId);
+        if (!existingUser.isPresent()) {
+            throw new UsernameNotFoundException(String.format(UserConstantes.USER_NOT_FOUND_EXCEPTION_MESSAGE, userId));
+        }
+
+        User user = existingUser.get();
+
+        if (!user.getUsername().equals(username) && userRepository.findByUsername(username).isPresent()) {
+            throw new UsernameNotFoundException(UserConstantes.USERNAME_ALREADY_TAKEN_EXCEPTION_MESSAGE);
+        }
+
+        userEntityUpdated.setId(userId);
+        userEntityUpdated.setPassword(passwordEncoder.encode(password));
+        userRepository.save(userEntityUpdated);
+        log.info(String.format(UserConstantes.USER_UPDATED_LOG_MESSAGE, username));
+
+        return true;
     }
 
     /**
-     * Deletes an user by its ID
+     * Cette méthode supprime l'utilisateur avec l'identifiant spécifié de la base de données.
      *
-     * @param userId							The user's ID we want to delete
-     * @return									True if the deletion was successful
+     * @param userId l'ID de l'utilisateur à supprimer
+     * @return true si l'utilisateur est supprimé avec succès, false sinon
+     * @throws UsernameNotFoundException si l'utilisateur avec l'ID donné n'est pas trouvé dans la base de données
+     * @throws NullPointerException      si l'ID de l'utilisateur est null
      */
     public boolean deleteUser(Long userId) {
-        Optional<User> user = userRepository.findById(userId);
-        if (userId != null && user.isPresent()) {
-            userRepository.delete(user.get());
-            log.info("[SERVICE] Deleted user with username : " + user.get().getUsername());
+
+        Objects.requireNonNull(userId, "L'identifiant de l'utilisateur ne peut pas être null");
+
+        Optional<User> existingUser = userRepository.findById(userId);
+        if (!existingUser.isPresent()) {
+            throw new UsernameNotFoundException(String.format(UserConstantes.USER_NOT_FOUND_EXCEPTION_MESSAGE, userId));
+        }
+
+        User user = existingUser.get();
+        userRepository.delete(user);
+        log.info(String.format(UserConstantes.USER_DELETED_LOG_MESSAGE, user.getUsername()));
+
+        return true;
+    }
+
+    /**
+     * Convertit un objet UserDto en entité User.
+     *
+     * @param userDto L'objet UserDto à convertir
+     * @return L'entité User correspondante
+     * @throws IllegalArgumentException si userDto est null
+     */
+    public Optional<User> convertDtoToEntity(UserDto userDto) {
+        Objects.requireNonNull(userDto, "L'objet UserDto ne peut pas être null");
+        User user = modelMapper.map(userDto, User.class);
+        return Optional.ofNullable(user);
+    }
+
+    /**
+     * Convertit une entité User en objet UserDto.
+     *
+     * @param userEntity L'entité User à convertir
+     * @return L'objet UserDto correspondant
+     * @throws IllegalArgumentException si userEntity est null
+     */
+    public Optional<UserDto> convertEntityToDto(User userEntity) {
+        Objects.requireNonNull(userEntity, "L'entité User ne peut pas être null");
+        UserDto userDto = modelMapper.map(userEntity, UserDto.class);
+        return Optional.ofNullable(userDto);
+    }
+
+    /**
+     * Vérifie que le mot de passe respecte les contraintes suivantes:
+     * au moins une lettre majuscule
+     * au moins un chiffre
+     * une longueur minimale de 8 caractères
+     *
+     * @param password le mot de passe à vérifier
+     * @return true si le mot de passe respecte les contraintes, false sinon
+     */
+    public boolean passwordConstraints(String password) {
+        String passwordPattern = "^(?=.*[A-Z])(?=.*\\d).{8,}$";
+        if (!password.matches(passwordPattern)) {
+            return false;
+        } else {
             return true;
         }
-        throw new UsernameNotFoundException("Could not find user with id : " + userId);
-    }
-
-    public User convertDtoToEntity(UserDto userDto) {
-        return modelMapper.map(userDto, User.class);
-    }
-
-    public UserDto convertEntityToDto(User userEntity) {
-        return modelMapper.map(userEntity, UserDto.class);
     }
 }

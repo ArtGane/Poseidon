@@ -23,7 +23,6 @@ import java.util.Collection;
 @Getter
 @Setter
 public class User implements UserDetails {
-
     public User(User user) {
         this.username = user.getUsername();
         this.password = user.getPassword();
@@ -47,8 +46,6 @@ public class User implements UserDetails {
     @Column
     private String role;
 
-
-    // Below are Spring Security related methods
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

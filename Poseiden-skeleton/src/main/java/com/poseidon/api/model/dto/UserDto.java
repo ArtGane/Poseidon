@@ -10,18 +10,9 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDto {
-
-
     private Long id;
-
-    @NotBlank(message = "Username is mandatory")
     private String username;
-
     private String password;
-
-    @NotBlank(message = "Full name is mandatory")
     private String fullname;
-
-    @NotBlank(message = "Role is mandatory")
     private String role;
 }

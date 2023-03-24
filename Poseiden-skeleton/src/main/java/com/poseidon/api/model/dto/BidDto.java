@@ -17,5 +17,5 @@ public class BidDto {
     @NotBlank(message = "Type is mandatory")
     private String type;
 
-    private String bidQuantity;
+    private Double bidQuantity;
 }

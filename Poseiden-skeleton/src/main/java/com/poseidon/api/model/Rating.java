@@ -13,9 +13,9 @@ import javax.persistence.*;
 public class Rating {
 
     @Id
-    @Column(name = "Id", nullable = false)
+    @Column(name = "Id")
     @GeneratedValue(strategy = GenerationType.AUTO)
-    Integer id;
+    Long id;
 
     @Column(name = "moodys_rating")
     String moodysRating;

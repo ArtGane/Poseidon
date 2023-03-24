@@ -10,17 +10,10 @@ import javax.validation.constraints.NotBlank;
 @Setter
 public class RatingDto {
 
-    private Integer id;
-
-    @NotBlank(message = "Moody's Rating is mandatory")
+    private Long id;
     private String moodysRating;
-
-    @NotBlank(message = "SandP's Rating is mandatory")
     private String sandPRating;
-
-    @NotBlank(message = "Fitch's Rating is mandatory")
     private String fitchRating;
-
     private String orderNumber;
 
 }

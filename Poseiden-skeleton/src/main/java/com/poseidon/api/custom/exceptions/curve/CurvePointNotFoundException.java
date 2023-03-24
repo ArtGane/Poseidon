@@ -1,4 +1,4 @@
-package com.poseidon.api.custom;
+package com.poseidon.api.custom.exceptions.curve;
 
 public class CurvePointNotFoundException extends RuntimeException {
     public CurvePointNotFoundException(String message) {

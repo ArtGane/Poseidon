@@ -1,4 +1,4 @@
-package com.poseidon.api.constantes;
+package com.poseidon.api.custom.constantes;
 
 public class UserConstantes {
     public static final String USER_UPDATED_LOG_MESSAGE = "[UserConfiguration] Updated user with username : %s";

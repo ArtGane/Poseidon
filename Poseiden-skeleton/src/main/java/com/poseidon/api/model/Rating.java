@@ -1,5 +1,6 @@
 package com.poseidon.api.model;
 
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -7,8 +8,8 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "rating")
-@Slf4j
 @NoArgsConstructor
+@Data
 public class Rating {
 
     @Id
@@ -16,16 +17,16 @@ public class Rating {
     @GeneratedValue(strategy = GenerationType.AUTO)
     Integer id;
 
-    @Column(name = "moodysRating")
+    @Column(name = "moodys_rating")
     String moodysRating;
 
-    @Column(name = "sandPRating")
+    @Column(name = "sandp_rating")
     String sandPRating;
 
-    @Column(name = "fitchRating")
+    @Column(name = "fitch_rating")
     String fitchRating;
 
-    @Column(name = "orderNumber")
+    @Column(name = "order_number")
     Integer orderNumber;
 
     public Rating( String moodysRating, String sandPRating, String fitchRating, Integer orderNumber) {

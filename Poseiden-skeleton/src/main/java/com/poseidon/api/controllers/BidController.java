@@ -1,5 +1,6 @@
 package com.poseidon.api.controllers;
 
+import com.poseidon.api.custom.constantes.BidConstantes;
 import com.poseidon.api.custom.exceptions.bid.BidConversionException;
 import com.poseidon.api.custom.exceptions.bid.BidCreationException;
 import com.poseidon.api.custom.exceptions.bid.BidNotFoundException;
@@ -21,8 +22,6 @@ import javax.validation.Valid;
 
 @Controller
 public class BidController {
-
-    private static final String CREATED_BID_MESSAGE_TEMPLATE = "Bid with id %d was successfully created";
 
     @Autowired
     BidService bidService;
@@ -47,7 +46,7 @@ public class BidController {
         try {
             Bid newBid = bidService.convertDtoToEntity(bidDto);
             bidService.createBid(newBid);
-            redirectAttributes.addFlashAttribute("message", String.format(CREATED_BID_MESSAGE_TEMPLATE, newBid.getId()));
+            redirectAttributes.addFlashAttribute("message", String.format(BidConstantes.CREATED_BID_MESSAGE_TEMPLATE, newBid.getId()));
             return "redirect:/bidList/list";
         } catch (BidConversionException | BidCreationException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());

@@ -4,7 +4,10 @@ import com.poseidon.api.model.CurvePoint;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository
-public interface CurvePointRepository extends JpaRepository<CurvePoint, Integer> {
+import java.util.Optional;
 
+@Repository
+public interface CurvePointRepository extends JpaRepository<CurvePoint, Long> {
+
+    Optional<CurvePoint> findCurvePointById(Long id);
 }

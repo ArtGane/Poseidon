@@ -5,10 +5,8 @@ import lombok.Data;
 
 @Data
 public class CurvePointDto {
-
     private Long id;
-    private Integer curveId;
+    private Long curveId;
     private Double term;
     private Double value;
-
 }

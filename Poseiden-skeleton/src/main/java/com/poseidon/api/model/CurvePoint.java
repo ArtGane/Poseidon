@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 public class CurvePoint {
 
     @Id
-    @Column(name = "id", nullable = false)
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.AUTO)
     Long id;
     @Column(name = "curve_id")
@@ -28,12 +28,10 @@ public class CurvePoint {
     @Column(name = "value")
     Double value;
 
-    @Transient
-    @Column(name = "as_of_Date")
+    @Column(name = "as_of_Date", nullable = true)
     private LocalDateTime asOfDate;
 
-    @Transient
-    @Column(name = "creation_date")
+    @Column(name = "creation_date", nullable = true)
     private LocalDateTime creationDate;
 
     public CurvePoint(Long id, Long curveId, Double term, Double value) {

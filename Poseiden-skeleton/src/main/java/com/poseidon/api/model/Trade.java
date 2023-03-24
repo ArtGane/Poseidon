@@ -1,84 +1,89 @@
 package com.poseidon.api.model;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 
-@Slf4j
 @Entity
 @Table(name = "trade")
 @NoArgsConstructor
+@Getter
+@Setter
 public class Trade {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "TradeId", nullable = false)
-    Integer tradeId;
+    @Column(name = "id")
+    Long id;
     @Column(name = "account")
     String account;
     @Column(name = "type")
     String type;
-    @Column(name = "buyQuantity")
-    Double buyQuantity;
 
-    @Column(name = "sellQuantity")
+    @Column(name = "buy_quantity")
+    Double buyQuantity;
+    @Column(name = "action")
+    String action;
+
+    @Column(name = "sellQuantity", nullable = true)
     Double sellQuantity;
 
-    @Column(name = "buyPrice")
+    @Column(name = "buyPrice", nullable = true)
     Double buyPrice;
 
-    @Column(name = "sellPrice")
+    @Column(name = "sellPrice", nullable = true)
     Double sellPrice;
 
-    @Column(name = "security")
+    @Column(name = "security", nullable = true)
     String security;
 
-    @Column(name = "status")
+    @Column(name = "status", nullable = true)
     String status;
 
-    @Column(name = "trader")
+    @Column(name = "trader", nullable = true)
     String trader;
 
-    @Column(name = "benchmark")
+    @Column(name = "benchmark", nullable = true)
     String benchmark;
 
-    @Column(name = "book")
+    @Column(name = "book", nullable = true)
     String book;
 
-    @Column(name = "creationName")
+    @Column(name = "creationName", nullable = true)
     String creationName;
 
-    @Column(name = "revisionName")
+    @Column(name = "revisionName", nullable = true)
     String revisionName;
 
-    @Column(name = "dealName")
+    @Column(name = "dealName", nullable = true)
     String dealName;
 
-    @Column(name = "dealType")
+    @Column(name = "dealType", nullable = true)
     String dealType;
 
-    @Column(name = "sourceListId")
+    @Column(name = "sourceListId", nullable = true)
     String sourceListId;
 
-    @Column(name = "side")
+    @Column(name = "side", nullable = true)
     String side;
 
-    @Column(name = "tradeDate")
+    @Column(name = "tradeDate", nullable = true)
     private LocalDateTime tradeDate;
 
-    @Column(name = "creationDate")
+    @Column(name = "creationDate", nullable = true)
     private LocalDateTime creationDate;
 
     @Column(name = "revisionDate")
     private LocalDateTime revisionDate;
 
-    public Trade(Integer tradeId, String account, String type, Double buyQuantity) {
-        this.tradeId = tradeId;
+    public Trade(Long id, String account, String type, String action) {
+        this.id = id;
         this.account = account;
         this.type = type;
-        this.buyQuantity = buyQuantity;
+        this.action = action;
     }
 }

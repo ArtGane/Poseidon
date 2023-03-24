@@ -11,9 +11,10 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Data
 public class Rule {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "Id", nullable = false)
+    @Column(name = "Id")
     Long id;
     @Column(name = "name")
     String name;
@@ -27,16 +28,6 @@ public class Rule {
     String sqlStr;
     @Column(name = "sql_part")
     String sqlPart;
-
-    public Rule(Long id, String name, String description, String json, String template, String sqlStr, String sqlPart) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.json = json;
-        this.template = template;
-        this.sqlStr = sqlStr;
-        this.sqlPart = sqlPart;
-    }
 
     public Rule(String name, String description, String json, String template, String sqlStr, String sqlPart) {
         this.name = name;

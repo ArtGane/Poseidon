@@ -1,6 +1,5 @@
 package com.poseidon.api.controllers;
 
-import com.poseidon.api.customexceptions.RatingServiceException;
 import com.poseidon.api.model.Rating;
 import com.poseidon.api.model.User;
 import com.poseidon.api.model.dto.RatingDto;
@@ -35,7 +34,7 @@ public class RatingController {
 
     @PostMapping("/rating/validate")
     public String validate(@Valid RatingDto ratingDto, BindingResult result, Model model,
-                           RedirectAttributes redirectAttributes) throws RatingServiceException {
+                           RedirectAttributes redirectAttributes) {
         if (!result.hasErrors()) {
             Rating newRating = ratingService.convertDtoToEntity(ratingDto);
             ratingService.createRating(newRating);
@@ -57,7 +56,7 @@ public class RatingController {
             RatingDto ratingDto = ratingService.convertEntityToDto(ratingToUpdate);
             ratingDto.setId(id);
             model.addAttribute("ratingDto", ratingDto);
-        } catch (RatingServiceException error) {
+        } catch (Exception error) {
             redirectAttributes.addFlashAttribute("message", error.getMessage());
             return "redirect:/rating/list";
         }
@@ -66,7 +65,7 @@ public class RatingController {
 
     @PostMapping("/rating/update/{id}")
     public String updateRating(@PathVariable("id") Integer id, @Valid RatingDto ratingDto, BindingResult result,
-                               Model model, RedirectAttributes redirectAttributes) throws RatingServiceException {
+                               Model model, RedirectAttributes redirectAttributes) {
 
         if (result.hasErrors()) {
             return "rating/update";

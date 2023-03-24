@@ -1,8 +1,8 @@
 package com.poseidon.api.service;
 
-import com.poseidon.api.custom.CurvePointAlreadyExistsException;
-import com.poseidon.api.custom.CurvePointNotFoundException;
-import com.poseidon.api.custom.InvalidCurvePointException;
+import com.poseidon.api.custom.exceptions.curve.CurvePointAlreadyExistsException;
+import com.poseidon.api.custom.exceptions.curve.CurvePointNotFoundException;
+import com.poseidon.api.custom.exceptions.curve.InvalidCurvePointException;
 import com.poseidon.api.model.CurvePoint;
 import com.poseidon.api.model.dto.CurvePointDto;
 import com.poseidon.api.repositories.CurvePointRepository;

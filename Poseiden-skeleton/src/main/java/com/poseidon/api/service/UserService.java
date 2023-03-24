@@ -1,6 +1,6 @@
 package com.poseidon.api.service;
 
-import com.poseidon.api.constantes.UserConstantes;
+import com.poseidon.api.custom.constantes.UserConstantes;
 import com.poseidon.api.model.User;
 import com.poseidon.api.model.dto.UserDto;
 import com.poseidon.api.repositories.UserRepository;
@@ -64,13 +64,11 @@ public class UserService implements UserDetailsService {
      */
     public User findUserById(Long userId) {
         Optional<User> user;
-
         if (userId == null) {
             throw new UsernameNotFoundException("Could not find user with id : " + userId);
         } else {
             user = userRepository.findById(userId);
         }
-
         return user.get();
     }
 

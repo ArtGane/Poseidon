@@ -1,11 +1,13 @@
 package com.poseidon.api.controllers;
 
+import com.poseidon.api.config.Utils;
 import com.poseidon.api.custom.exceptions.rating.RatingDeletionException;
 import com.poseidon.api.model.Rating;
-import com.poseidon.api.model.dto.RatingDto;
+import com.poseidon.api.repositories.RatingRepository;
 import com.poseidon.api.service.RatingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -22,38 +24,34 @@ public class RatingController {
 
     @Autowired
     RatingService ratingService;
+    @Autowired
+    private RatingRepository ratingRepository;
+
     @RequestMapping("/rating/list")
     public String home(Model model) {
-        model.addAttribute("ratings", ratingService.findAllRatings());
+        model.addAttribute("ratings", Utils.findAll(ratingRepository));
         return "rating/list";
     }
 
     @GetMapping("/rating/add")
-    public String addRatingForm(RatingDto ratingDto) {
+    public String addRatingForm(Rating rating) {
         return "rating/add";
     }
 
     @PostMapping("/rating/validate")
-    public String validate(@Valid RatingDto ratingDto, BindingResult result, Model model,
-                           RedirectAttributes redirectAttributes) {
-
-        if (ratingDto == null) {
-            throw new IllegalArgumentException("RatingDto ne peut pas être null");
+    public String validate(@Valid Rating rating, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
+        if (rating == null) {
+            throw new IllegalArgumentException("Rating ne peut pas être null");
         }
-
         if (result.hasErrors()) {
             return "rating/add";
         }
-
-        Rating newRating = ratingService.convertDtoToEntity(ratingDto);
-        boolean created = ratingService.createRating(newRating);
+        boolean created = ratingService.createRating(rating);
 
         if (created) {
             redirectAttributes.addFlashAttribute("message",
-                    String.format("Le rating avec l'id %d a été créé avec succès", newRating.getId()));
-
-            model.addAttribute("ratings", ratingService.findAllRatings());
-
+                    String.format("Le rating avec l'id %d a été créé avec succès", rating.getId()));
+            model.addAttribute("ratings", Utils.findAll(ratingRepository));
             return "redirect:/rating/list";
         } else {
             model.addAttribute("error", "Échec de la création du rating");
@@ -62,28 +60,25 @@ public class RatingController {
     }
 
     @GetMapping("/rating/update/{id}")
-    public String showUpdateForm(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
+    public String showUpdateForm(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) throws ChangeSetPersister.NotFoundException {
 
         if (id == null) {
             redirectAttributes.addFlashAttribute("message", "L'ID ne peut pas être nul");
             return "redirect:/rating/list";
         }
 
-        Rating ratingToUpdate = ratingService.findRatingById(id);
+        Rating ratingToUpdate = Utils.findById(id, ratingRepository);
         if (ratingToUpdate == null) {
             redirectAttributes.addFlashAttribute("message", "Aucun rating trouvé avec l'ID " + id);
             return "redirect:/rating/list";
         }
 
-        RatingDto ratingDto = ratingService.convertEntityToDto(ratingToUpdate);
-        ratingDto.setId(id);
-        model.addAttribute("ratingDto", ratingDto);
+        model.addAttribute("rating", ratingToUpdate);
 
         return "rating/update";
     }
 
-    @PostMapping("/rating/update/{id}")
-    public String updateRating(@PathVariable("id") Long id, @Valid RatingDto ratingDto, BindingResult result,
+    public String updateRating(@PathVariable("id") Long id, @Valid Rating rating, BindingResult result,
                                Model model, RedirectAttributes redirectAttributes) {
         try {
             if (id == null) {
@@ -91,16 +86,17 @@ public class RatingController {
             }
 
             if (result.hasErrors()) {
+                model.addAttribute("rating", rating);
                 return "rating/update";
             }
 
-            Rating updatedRating = ratingService.convertDtoToEntity(ratingDto);
-            ratingService.updateRating(id, updatedRating);
+            rating.setId(id);
+            ratingService.updateRating(id, rating);
 
             redirectAttributes.addFlashAttribute("message",
                     String.format("La notation avec l'ID '%d' a été mise à jour avec succès", id));
 
-            model.addAttribute("ratings", ratingService.findAllRatings());
+            model.addAttribute("ratings", Utils.findAll(ratingRepository));
 
             return "redirect:/rating/list";
         } catch (IllegalArgumentException | DataAccessException e) {

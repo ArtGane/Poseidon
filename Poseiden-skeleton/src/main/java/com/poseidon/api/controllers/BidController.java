@@ -1,13 +1,14 @@
 package com.poseidon.api.controllers;
 
+import com.poseidon.api.config.Utils;
 import com.poseidon.api.custom.constantes.BidConstantes;
-import com.poseidon.api.custom.exceptions.bid.BidConversionException;
 import com.poseidon.api.custom.exceptions.bid.BidCreationException;
 import com.poseidon.api.custom.exceptions.bid.BidNotFoundException;
 import com.poseidon.api.model.Bid;
-import com.poseidon.api.model.dto.BidDto;
+import com.poseidon.api.repositories.BidRepository;
 import com.poseidon.api.service.BidService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -26,52 +27,50 @@ public class BidController {
     @Autowired
     BidService bidService;
 
+    @Autowired
+    BidRepository bidRepository;
+
     @RequestMapping("/bidList/list")
     public String home(Model model) {
-        model.addAttribute("bids", bidService.findAllBids());
+        model.addAttribute("bids", Utils.findAll(bidRepository));
 
         return "bidList/list";
     }
 
     @GetMapping("/bidList/add")
-    public String addBidForm(BidDto bidDto) {
+    public String addBidForm(Bid bid) {
         return "bidList/add";
     }
 
     @PostMapping("/bidList/validate")
-    public String createBid(@Valid BidDto bidDto, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+    public String createBid(@Valid Bid bid, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             return "bidList/add";
         }
         try {
-            Bid newBid = bidService.convertDtoToEntity(bidDto);
-            bidService.createBid(newBid);
-            redirectAttributes.addFlashAttribute("message", String.format(BidConstantes.CREATED_BID_MESSAGE_TEMPLATE, newBid.getId()));
+            bidService.createBid(bid);
+            redirectAttributes.addFlashAttribute("message", String.format(BidConstantes.CREATED_BID_MESSAGE_TEMPLATE, bid.getId()));
             return "redirect:/bidList/list";
-        } catch (BidConversionException | BidCreationException e) {
+        } catch (BidCreationException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:/bidList/add";
         }
     }
 
     @GetMapping("/bidList/update/{id}")
-    public String showUpdateForm(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
+    public String showUpdateForm(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) throws ChangeSetPersister.NotFoundException {
         try {
-            Bid bidToUpdate = bidService.findBidById(id);
-            BidDto bidDto = bidService.convertEntityToDto(bidToUpdate);
-            model.addAttribute("bidDto", bidDto);
+            Bid bidToUpdate = Utils.findById(id, bidRepository);
+            model.addAttribute("bid", bidToUpdate);
             return "bidList/update";
         } catch (BidNotFoundException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return "redirect:/bidList/list";
-        } catch (BidConversionException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Error converting Bid to BidDto");
             return "redirect:/bidList/list";
         }
     }
 
     @PostMapping("/bidList/update/{id}")
-    public String updateBid(@PathVariable("id") Long id, @Valid BidDto bidDto,
+    public String updateBid(@PathVariable("id") Long id, @Valid Bid bid,
                             BindingResult result, Model model, RedirectAttributes redirectAttributes) {
 
         if (result.hasErrors()) {
@@ -79,8 +78,7 @@ public class BidController {
         }
 
         try {
-            Bid updatedBid = bidService.convertDtoToEntity(bidDto);
-            if (bidService.updateBid(id, updatedBid)) {
+            if (bidService.updateBid(id, bid)) {
                 redirectAttributes.addFlashAttribute("message", String.format("Bid with id " + id + " was successfully updated"));
                 return "redirect:/bidList/list";
             } else {
@@ -94,11 +92,12 @@ public class BidController {
     }
 
     @GetMapping("/bidList/delete/{id}")
-    public String deleteBid(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
+    public String deleteBid(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) throws ChangeSetPersister.NotFoundException {
         try {
-            bidService.deleteBid(id);
+            Bid bidToDelete = Utils.findById(id, bidRepository);
+            bidService.deleteBid(bidToDelete);
             redirectAttributes.addFlashAttribute("message", String.format("Bid with id " + id + " was successfully deleted"));
-            model.addAttribute("bids", bidService.findAllBids());
+            model.addAttribute("bids", Utils.findAll(bidRepository));
         } catch (BidNotFoundException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:/bidList/list";

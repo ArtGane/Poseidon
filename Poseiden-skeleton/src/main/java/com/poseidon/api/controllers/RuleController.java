@@ -1,7 +1,8 @@
 package com.poseidon.api.controllers;
 
+import com.poseidon.api.config.Utils;
 import com.poseidon.api.model.Rule;
-import com.poseidon.api.model.dto.RuleDto;
+import com.poseidon.api.repositories.RuleRepository;
 import com.poseidon.api.service.RuleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,31 +21,28 @@ public class RuleController {
 
     @Autowired
     RuleService ruleService;
+    @Autowired
+    private RuleRepository ruleRepository;
 
     @RequestMapping("/ruleName/list")
     public String home(Model model) {
-        model.addAttribute("rules", ruleService.findAllRules());
+        model.addAttribute("rules", Utils.findAll(ruleRepository));
         return "ruleName/list";
     }
 
     @GetMapping("/ruleName/add")
-    public String addRuleForm(RuleDto ruleDto) {
+    public String addRuleForm(Rule rule) {
         return "ruleName/add";
     }
 
     @PostMapping("/ruleName/validate")
-    public String validate(@Valid RuleDto ruleDto, BindingResult result, Model model,
+    public String validate(@Valid Rule rule, BindingResult result, Model model,
                            RedirectAttributes redirectAttributes) {
         if (!result.hasErrors()) {
-
-            Rule newRule = ruleService.convertDtoToEntity(ruleDto);
-            ruleService.createRule(newRule);
-
+            ruleService.createRule(rule);
             redirectAttributes.addFlashAttribute("message",
-                    String.format("Rule with id '%d' was successfully created", newRule.getId()));
-
-            model.addAttribute("rules", ruleService.findAllRules());
-
+                    String.format("Rule with id '%d' was successfully created", rule.getId()));
+            model.addAttribute("rules", Utils.findAll(ruleRepository));
             return "redirect:/ruleName/list";
         }
         return "ruleName/add";
@@ -54,10 +52,8 @@ public class RuleController {
     public String showUpdateForm(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
 
         try {
-            Rule ruleNameToUpdate = ruleService.findRuleById(id);
-            RuleDto ruleDto = ruleService.convertEntityToDto(ruleNameToUpdate);
-            ruleDto.setId(id);
-            model.addAttribute("ruleDto", ruleDto);
+            Rule ruleToUpdate = Utils.findById(id, ruleRepository);
+            model.addAttribute("rule", ruleToUpdate);
         } catch (Exception error) {
             redirectAttributes.addFlashAttribute("message", error.getMessage());
             return "redirect:/ruleName/list";
@@ -66,20 +62,19 @@ public class RuleController {
     }
 
     @PostMapping("/ruleName/update/{id}")
-    public String updateRuleName(@PathVariable("id") Long id, @Valid RuleDto ruleDto, BindingResult result,
-                                 Model model, RedirectAttributes redirectAttributes) {
+    public String updateRule(@PathVariable("id") Long id, @Valid Rule rule, BindingResult result,
+                             Model model, RedirectAttributes redirectAttributes) {
 
         if (result.hasErrors()) {
             return "ruleName/update";
         }
 
-        Rule updatedRuleName = ruleService.convertDtoToEntity(ruleDto);
-        ruleService.updateRule(id, updatedRuleName);
+        ruleService.updateRule(id, rule);
 
         redirectAttributes.addFlashAttribute("message",
                 String.format("Rule with id '%d' was successfully updated", id));
 
-        model.addAttribute("rules", ruleService.findAllRules());
+        model.addAttribute("rules", Utils.findAll(ruleRepository));
 
         return "redirect:/ruleName/list";
     }
@@ -96,7 +91,7 @@ public class RuleController {
         redirectAttributes.addFlashAttribute("message",
                 String.format("Rule with id '%d' was successfully deleted", id));
 
-        model.addAttribute("rules", ruleService.findAllRules());
+        model.addAttribute("rules", Utils.findAll(ruleRepository));
 
         return "redirect:/ruleName/list";
     }

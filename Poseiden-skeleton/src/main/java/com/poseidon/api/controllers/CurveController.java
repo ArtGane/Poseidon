@@ -1,13 +1,17 @@
 package com.poseidon.api.controllers;
 
+import com.poseidon.api.config.Utils;
+import com.poseidon.api.custom.exceptions.curve.CurvePointNotFoundException;
 import com.poseidon.api.model.CurvePoint;
-import com.poseidon.api.model.dto.CurvePointDto;
+import com.poseidon.api.repositories.CurvePointRepository;
 import com.poseidon.api.service.CurvePointService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,52 +25,50 @@ public class CurveController {
 
     @Autowired
     CurvePointService curvePointService;
+    @Autowired
+    private CurvePointRepository curvePointRepository;
 
     @RequestMapping("/curvePoint/list")
     public String home(Model model) {
-        model.addAttribute("curvePoints", curvePointService.findAllCurves());
+        model.addAttribute("curvePoints", Utils.findAll(curvePointRepository));
         return "curvePoint/list";
     }
 
     @GetMapping("/curvePoint/add")
-    public String addCurvePointForm(CurvePointDto curvePointDto) {
+    public String addCurvePointForm(CurvePoint curvePoint) {
         return "curvePoint/add";
     }
 
     @PostMapping("/curvePoint/validate")
-    public String validate(@Valid CurvePointDto curvePointDto, BindingResult result, Model model,
+    public String validate(@ModelAttribute("curvePoint") @Valid CurvePoint curvePoint, BindingResult result, Model model,
                            RedirectAttributes redirectAttributes) {
         if (!result.hasErrors()) {
-            CurvePoint newCurvePoint = curvePointService.convertDtoToEntity(curvePointDto);
-            curvePointService.createCurve(newCurvePoint);
-            model.addAttribute("curvePoints", curvePointService.findAllCurves());
+            curvePointService.createCurve(curvePoint);
+            model.addAttribute("curvePoints", Utils.findAll(curvePointRepository));
             redirectAttributes.addFlashAttribute("message",
-                    String.format("Curve Point with id " + newCurvePoint.getId() + " was successfully created"));
+                    String.format("Curve Point with id " + curvePoint.getId() + " was successfully created"));
             return "redirect:/curvePoint/list";
         }
         return "curvePoint/add";
     }
 
     @GetMapping("/curvePoint/update/{id}")
-    public String showUpdateForm(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
-        CurvePoint curvePointToUpdate = curvePointService.findCurvePointById(id);
-        CurvePointDto curvePointDto = curvePointService.convertEntityToDto(curvePointToUpdate);
-        curvePointDto.setId(id);
-        model.addAttribute("curvePointDto", curvePointDto);
+    public String showUpdateForm(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) throws CurvePointNotFoundException, ChangeSetPersister.NotFoundException {
+        CurvePoint curvePointToUpdate = Utils.findById(id, curvePointRepository);
+        model.addAttribute("curvePoint", curvePointToUpdate);
 
         return "curvePoint/update";
     }
 
     @PostMapping("/curvePoint/update/{id}")
-    public String updateBid(@PathVariable("id") Long id, @Valid CurvePointDto curvePointDto,
+    public String updateBid(@PathVariable("id") Long id, @Valid CurvePoint updatedCurvePoint,
                             BindingResult result, Model model, RedirectAttributes redirectAttributes) {
 
         if (result.hasErrors()) {
             return "curvePoint/update";
         }
-        CurvePoint updatedCurvePoint = curvePointService.convertDtoToEntity(curvePointDto);
         curvePointService.updateCurve(id, updatedCurvePoint);
-        model.addAttribute("curvePoints", curvePointService.findAllCurves());
+        model.addAttribute("curvePoints", Utils.findAll(curvePointRepository));
         redirectAttributes.addFlashAttribute("message",
                 String.format("Curve Point with id '%d' was successfully updated", id));
         redirectAttributes.addFlashAttribute("message_type", "alert-primary");
@@ -75,11 +77,11 @@ public class CurveController {
     }
 
     @GetMapping("/curvePoint/delete/{id}")
-    public String deleteBid(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
-            curvePointService.deleteCurve(id);
-        redirectAttributes.addFlashAttribute("message",
+    public String deleteBid(@PathVariable("id") Long id, Model model) {
+        curvePointService.deleteCurve(id);
+        model.addAttribute("message",
                 String.format("Curve Point with id '%d' was successfully deleted", id));
-        model.addAttribute("curvePoints", curvePointService.findAllCurves());
-        return "redirect:/curvePoint/list";
+        model.addAttribute("curvePoints", Utils.findAll(curvePointRepository));
+        return "curvePoint/list";
     }
 }

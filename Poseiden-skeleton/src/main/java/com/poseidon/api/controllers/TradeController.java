@@ -1,12 +1,14 @@
 package com.poseidon.api.controllers;
 
+import com.poseidon.api.config.Utils;
 import com.poseidon.api.custom.exceptions.rating.TradeAlreadyExistsException;
 import com.poseidon.api.custom.exceptions.trade.TradeValidationException;
 import com.poseidon.api.model.Trade;
-import com.poseidon.api.model.dto.TradeDto;
+import com.poseidon.api.repositories.TradeRepository;
 import com.poseidon.api.service.TradeService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
 public class TradeController {
@@ -27,12 +28,12 @@ public class TradeController {
 
     @Autowired
     ModelMapper modelMapper;
+    @Autowired
+    private TradeRepository tradeRepository;
 
     @RequestMapping("/trade/list")
     public String listTrades(Model model) {
-        List<TradeDto> trades = tradeService.findAllTrades().stream()
-                .map(trade -> modelMapper.map(trade, TradeDto.class))
-                .collect(Collectors.toList());
+        List<Trade> trades = Utils.findAll(tradeRepository);
         model.addAttribute("trades", trades);
         return "trade/list";
     }
@@ -54,22 +55,22 @@ public class TradeController {
             } else {
                 model.addAttribute("errorMessage", "Le trade existe déjà !");
             }
-            List<Trade> trades = tradeService.findAllTrades();
+            List<Trade> trades = Utils.findAll(tradeRepository);
             model.addAttribute("trades", trades);
             return "trade/list";
         } catch (TradeAlreadyExistsException e) {
             model.addAttribute("errorMessage", e.getMessage());
-            List<Trade> trades = tradeService.findAllTrades();
+            List<Trade> trades = Utils.findAll(tradeRepository);
             model.addAttribute("trades", trades);
             return "trade/list";
         } catch (TradeValidationException e) {
             model.addAttribute("errorMessage", e.getMessage());
-            List<Trade> trades = tradeService.findAllTrades();
+            List<Trade> trades = Utils.findAll(tradeRepository);
             model.addAttribute("trades", trades);
             return "trade/list";
         } catch (Exception e) {
             model.addAttribute("errorMessage", "Une erreur est survenue lors de la création du trade !");
-            List<Trade> trades = tradeService.findAllTrades();
+            List<Trade> trades = Utils.findAll(tradeRepository);
             model.addAttribute("trades", trades);
             return "trade/list";
         }
@@ -77,21 +78,61 @@ public class TradeController {
 
 
     @GetMapping("/trade/update/{id}")
-    public String showUpdateForm(@PathVariable("id") Integer id, Model model) {
-        // TODO: get Trade by Id and to model then show to the form
+    public String showUpdateForm(@PathVariable("id") Long id, Model model) throws ChangeSetPersister.NotFoundException {
+        Trade trade = Utils.findById(id, tradeRepository);
+        if (trade == null) {
+            model.addAttribute("errorMessage", "Le trade avec l'ID " + id + " n'existe pas !");
+            return "trade/list";
+        }
+        model.addAttribute("trade", trade);
         return "trade/update";
     }
 
     @PostMapping("/trade/update/{id}")
-    public String updateTrade(@PathVariable("id") Integer id, @Valid Trade trade,
-                              BindingResult result, Model model) {
-        // TODO: check required fields, if valid call service to update Trade and return Trade list
-        return "redirect:/trade/list";
+    public String updateTrade(@PathVariable("id") Long id, @Valid Trade trade, BindingResult result, Model model) throws ChangeSetPersister.NotFoundException {
+        if (result.hasErrors()) {
+            model.addAttribute("trade", trade);
+            return "trade/edit";
+        }
+
+        Trade existingTrade = Utils.findById(id, tradeRepository);
+        if (existingTrade == null) {
+            model.addAttribute("errorMessage", "Le trade avec l'ID " + id + " n'existe pas !");
+            List<Trade> trades = Utils.findAll(tradeRepository);
+            model.addAttribute("trades", trades);
+            return "trade/list";
+        }
+
+        try {
+            trade.setId(id);
+            tradeService.updateTrade(trade);
+            model.addAttribute("successMessage", "Le trade a été mis à jour avec succès !");
+            List<Trade> trades = Utils.findAll(tradeRepository);
+            model.addAttribute("trades", trades);
+            return "trade/list";
+        } catch (TradeValidationException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute("trade", trade);
+            return "trade/edit";
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Une erreur est survenue lors de la mise à jour du trade !");
+            List<Trade> trades = Utils.findAll(tradeRepository);
+            model.addAttribute("trades", trades);
+            return "trade/list";
+        }
     }
 
     @GetMapping("/trade/delete/{id}")
-    public String deleteTrade(@PathVariable("id") Integer id, Model model) {
-        // TODO: Find Trade by Id and delete the Trade, return to Trade list
-        return "redirect:/trade/list";
+    public String deleteTrade(@PathVariable("id") Long id, Model model) throws ChangeSetPersister.NotFoundException {
+        Trade trade =  Utils.findById(id, tradeRepository);
+        if (trade == null) {
+            model.addAttribute("errorMessage", "Le trade avec l'ID " + id + " n'existe pas !");
+        } else {
+            tradeService.deleteTrade(id);
+            model.addAttribute("successMessage", "Le trade a été supprimé avec succès !");
+        }
+        List<Trade> trades = Utils.findAll(tradeRepository);
+        model.addAttribute("trades", trades);
+        return "trade/list";
     }
 }

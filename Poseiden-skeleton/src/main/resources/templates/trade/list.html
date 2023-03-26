@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" 
+<html xmlns="http://www.w3.org/1999/xhtml"
 	  xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="utf-8"/>
-<title>Home</title>
-<link rel="stylesheet" href="../../css/bootstrap.min.css" >
+	<meta charset="utf-8"/>
+	<title>Home</title>
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" >
 </head>
 <body>
 <div class="container">
@@ -28,16 +28,26 @@
 		<a href="/trade/add" class="btn btn-primary btn-sm">Add New</a>
 		<table class="table table-bordered">
 			<thead>
-				<tr>
-					<th>Id</th>
-					<th>Account</th>
-					<th>Type</th>
-					<th>Buy Quantity</th>
-					<th>Action</th>
-				</tr>
+			<tr>
+				<th>Id</th>
+				<th>Account</th>
+				<th>Type</th>
+				<th>Buy Quantity</th>
+				<th>Action</th>
+			</tr>
 			</thead>
 			<tbody>
-			<!-- TODO: Show all Trade to the table, the Action column will have Edit & Delete buttons -->
+			<!-- Show all Trade to the table, the Action column will have Edit & Delete buttons -->
+			<tr th:each="trade : ${trades}">
+				<td th:text="${trade.id}"></td>
+				<td th:text="${trade.account}"></td>
+				<td th:text="${trade.type}"></td>
+				<td th:text="${trade.buyQuantity}"></td>
+				<td>
+					<a th:href="@{/trade/update/{id}(id=${trade.id})}" class="btn btn-primary btn-sm">Edit</a>
+					<a th:href="@{/trade/delete/{id}(id=${trade.id})}" class="btn btn-danger btn-sm">Delete</a>
+				</td>
+			</tr>
 			</tbody>
 		</table>
 	</div>

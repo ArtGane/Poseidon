@@ -1,12 +1,13 @@
 package com.poseidon.api.service;
 
 import com.poseidon.api.custom.constantes.UserConstantes;
+import com.poseidon.api.model.Role;
 import com.poseidon.api.model.User;
-import com.poseidon.api.model.dto.UserDto;
 import com.poseidon.api.repositories.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -176,32 +177,6 @@ public class UserService implements UserDetailsService {
     }
 
     /**
-     * Convertit un objet UserDto en entité User.
-     *
-     * @param userDto L'objet UserDto à convertir
-     * @return L'entité User correspondante
-     * @throws IllegalArgumentException si userDto est null
-     */
-    public Optional<User> convertDtoToEntity(UserDto userDto) {
-        Objects.requireNonNull(userDto, "L'objet UserDto ne peut pas être null");
-        User user = modelMapper.map(userDto, User.class);
-        return Optional.ofNullable(user);
-    }
-
-    /**
-     * Convertit une entité User en objet UserDto.
-     *
-     * @param userEntity L'entité User à convertir
-     * @return L'objet UserDto correspondant
-     * @throws IllegalArgumentException si userEntity est null
-     */
-    public Optional<UserDto> convertEntityToDto(User userEntity) {
-        Objects.requireNonNull(userEntity, "L'entité User ne peut pas être null");
-        UserDto userDto = modelMapper.map(userEntity, UserDto.class);
-        return Optional.ofNullable(userDto);
-    }
-
-    /**
      * Vérifie que le mot de passe respecte les contraintes suivantes:
      * au moins une lettre majuscule
      * au moins un chiffre
@@ -217,5 +192,17 @@ public class UserService implements UserDetailsService {
         } else {
             return true;
         }
+    }
+
+    /**
+     * Vérifie si l'utilisateur actuel est un administrateur en fonction de son nom d'utilisateur et de son rôle.
+     *
+     * @param authentication l'objet Authentication représentant l'utilisateur authentifié
+     * @return true si l'utilisateur actuel est un administrateur, false sinon
+     */
+    public boolean isCurrentUserAdmin(Authentication authentication) {
+        String username = authentication.getName();
+        User currentUser = (User) loadUserByUsername(username);
+        return currentUser != null && Role.ADMIN.equals(Role.valueOf(currentUser.getRole()));
     }
 }

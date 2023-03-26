@@ -4,7 +4,6 @@ import com.poseidon.api.custom.exceptions.rating.TradeAlreadyExistsException;
 import com.poseidon.api.custom.exceptions.rating.TradeNotFoundException;
 import com.poseidon.api.custom.exceptions.trade.InvalidTradeException;
 import com.poseidon.api.model.Trade;
-import com.poseidon.api.model.dto.TradeDto;
 import com.poseidon.api.repositories.TradeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -23,18 +22,6 @@ public class TradeService {
 
     @Autowired
     ModelMapper modelMapper;
-
-    public List<Trade> findAllTrades() {
-        return tradeRepository.findAll();
-    }
-
-    public Trade findTradeById(Long id) {
-        if (id == null) {
-            throw new IllegalArgumentException("ID cannot be null");
-        }
-        return tradeRepository.findById(id)
-                .orElseThrow();
-    }
 
     /**
      * Crée un nouvel objet Trade et l'ajoute à la base de données.
@@ -118,31 +105,4 @@ public class TradeService {
         log.info("[TradeConfiguration] Trade avec ID '{}' supprimé avec succès", id);
     }
 
-    /**
-     * Convertit un objet TradeDto en entité Trade à l'aide de ModelMapper.
-     *
-     * @param tradeDto l'objet TradeDto à convertir
-     * @return l'entité Trade convertie
-     * @throws IllegalArgumentException si tradeDto est null
-     */
-    public Trade convertDtoToEntity(TradeDto tradeDto) {
-        if (tradeDto == null) {
-            throw new IllegalArgumentException("Le TradeDto ne peut pas être null");
-        }
-        return modelMapper.map(tradeDto, Trade.class);
-    }
-
-    /**
-     * Convertit une entité Trade en objet TradeDto à l'aide de ModelMapper.
-     *
-     * @param tradeEntity l'entité Trade à convertir
-     * @return l'objet TradeDto converti
-     * @throws IllegalArgumentException si tradeEntity est null
-     */
-    public TradeDto convertEntityToDto(Trade tradeEntity) {
-        if (tradeEntity == null) {
-            throw new IllegalArgumentException("Le Trade ne peut pas être null");
-        }
-        return modelMapper.map(tradeEntity, TradeDto.class);
-    }
 }

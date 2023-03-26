@@ -4,7 +4,6 @@ import com.poseidon.api.custom.exceptions.curve.CurvePointAlreadyExistsException
 import com.poseidon.api.custom.exceptions.curve.CurvePointNotFoundException;
 import com.poseidon.api.custom.exceptions.curve.InvalidCurvePointException;
 import com.poseidon.api.model.CurvePoint;
-import com.poseidon.api.model.dto.CurvePointDto;
 import com.poseidon.api.repositories.CurvePointRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -20,22 +19,6 @@ public class CurvePointService {
 
     @Autowired
     CurvePointRepository curvePointRepository;
-
-    @Autowired
-    ModelMapper modelMapper;
-
-
-    public List<CurvePoint> findAllCurves() {
-        return curvePointRepository.findAll();
-    }
-
-    public CurvePoint findCurvePointById(Long id) {
-        if (id == null) {
-            throw new IllegalArgumentException("ID cannot be null");
-        }
-        return curvePointRepository.findById(id)
-                .orElseThrow(() -> new CurvePointNotFoundException("Could not find Curve Point with ID: " + id));
-    }
 
     /**
      * Crée un nouveau CurvePoint.
@@ -128,33 +111,5 @@ public class CurvePointService {
         }
 
         throw new CurvePointNotFoundException("Impossible de supprimer le CurvePoint avec l'ID: " + id);
-    }
-
-    /**
-     * Convertit un objet CurvePointDto en une entité CurvePoint.
-     *
-     * @param curvePointDto l'objet CurvePointDto à convertir en entité CurvePoint.
-     * @return l'entité CurvePoint correspondante à l'objet CurvePointDto donné.
-     * @throws IllegalArgumentException si l'objet CurvePointDto donné est null.
-     */
-    public CurvePoint convertDtoToEntity(CurvePointDto curvePointDto) {
-        if (curvePointDto == null) {
-            throw new IllegalArgumentException("CurvePointDto ne peut pas être null");
-        }
-        return modelMapper.map(curvePointDto, CurvePoint.class);
-    }
-
-    /**
-     * Convertit une entité CurvePoint en un objet CurvePointDto.
-     *
-     * @param curvePoint l'entité CurvePoint à convertir en objet CurvePointDto.
-     * @return l'objet CurvePointDto correspondant à l'entité CurvePoint donnée.
-     * @throws IllegalArgumentException si l'entité CurvePoint donnée est null.
-     */
-    public CurvePointDto convertEntityToDto(CurvePoint curvePoint) {
-        if (curvePoint == null) {
-            throw new IllegalArgumentException("CurvePoint ne peut pas être null");
-        }
-        return modelMapper.map(curvePoint, CurvePointDto.class);
     }
 }

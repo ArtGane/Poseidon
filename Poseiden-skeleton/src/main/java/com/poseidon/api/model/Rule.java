@@ -1,5 +1,6 @@
 package com.poseidon.api.model;
 
+import com.poseidon.api.repositories.customconfig.Identifiable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +11,7 @@ import javax.persistence.*;
 @Table(name = "rule")
 @NoArgsConstructor
 @Data
-public class Rule {
+public class Rule implements Identifiable<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -36,5 +37,10 @@ public class Rule {
         this.template = template;
         this.sqlStr = sqlStr;
         this.sqlPart = sqlPart;
+    }
+
+    @Override
+    public Long getId() {
+        return id;
     }
 }

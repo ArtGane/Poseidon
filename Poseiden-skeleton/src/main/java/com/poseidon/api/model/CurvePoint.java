@@ -1,5 +1,6 @@
 package com.poseidon.api.model;
 
+import com.poseidon.api.repositories.customconfig.Identifiable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Setter
-public class CurvePoint {
+public class CurvePoint implements Identifiable<Long> {
 
     @Id
     @Column(name = "id")
@@ -39,5 +40,10 @@ public class CurvePoint {
         this.curveId = curveId;
         this.term = term;
         this.value = value;
+    }
+
+    @Override
+    public Long getId() {
+        return id;
     }
 }

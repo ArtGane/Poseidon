@@ -1,16 +1,15 @@
 package com.poseidon.api.service;
 
+import com.poseidon.api.config.Utils;
 import com.poseidon.api.custom.exceptions.bid.BidNotFoundException;
 import com.poseidon.api.custom.exceptions.bid.InvalidBidException;
 import com.poseidon.api.model.Bid;
-import com.poseidon.api.model.dto.BidDto;
 import com.poseidon.api.repositories.BidRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -22,30 +21,6 @@ public class BidService {
 
     @Autowired
     ModelMapper modelMapper;
-
-    public List<Bid> findAllBids() {
-        return bidRepository.findAll();
-    }
-
-    /**
-     * Recherche un objet Bid par son identifiant.
-     *
-     * @param id L'identifiant de l'objet Bid à rechercher
-     * @return L'objet Bid correspondant à l'identifiant donné
-     * @throws BidNotFoundException si aucun objet Bid correspondant n'est trouvé pour l'identifiant donné
-     * @throws IllegalArgumentException si l'identifiant est null
-     */
-    public Bid findBidById(Long id) throws BidNotFoundException {
-        if (id == null) {
-            throw new IllegalArgumentException("L'identifiant ne peut pas être null");
-        }
-        Optional<Bid> bid = bidRepository.findBidById(id);
-        if (bid.isPresent()) {
-            return bid.get();
-        } else {
-            throw new BidNotFoundException("Impossible de trouver un objet Bid avec l'identifiant : " + id);
-        }
-    }
 
     /**
      * Crée un nouvel objet Bid en base de données.
@@ -106,44 +81,17 @@ public class BidService {
     /**
      * Supprime une Bid avec l'ID donné de la base de données.
      *
-     * @param id L'ID de la Bid à supprimer
+     * @param bid Bid à supprimer
      * @throws BidNotFoundException si aucune Bid n'est trouvée avec l'ID donné
      * @return true si la Bid est supprimée avec succès, false sinon
      */
-    public boolean deleteBid(Long id) throws BidNotFoundException {
-        Optional<Bid> bid = bidRepository.findBidById(id);
-        if (id != null && bid.isPresent()) {
-            bidRepository.delete(bid.get());
-            log.info("[BidConfiguration] Bid supprimée avec succès avec l'ID " + id);
+    public boolean deleteBid(Bid bid) throws BidNotFoundException {
+        if (Utils.isPresent(bid, bidRepository)) {
+            bidRepository.delete(bid);
+            log.info("[BidConfiguration] Bid supprimée avec succès avec l'ID " + bid.getId());
             return true;
         }
-        throw new BidNotFoundException("Aucune Bid trouvée avec l'ID : " + id);
-    }
-    /**
-     * Convertit un objet BidDto en entité Bid à l'aide de ModelMapper.
-     *
-     * @param bidDto l'objet BidDto à convertir
-     * @return l'entité Bid convertie
-     * @throws IllegalArgumentException si bidDto est null
-     */
-    public Bid convertDtoToEntity(BidDto bidDto) {
-        if (bidDto == null) {
-            throw new IllegalArgumentException("Le BidDto ne peut pas être null");
-        }
-        return modelMapper.map(bidDto, Bid.class);
+        throw new BidNotFoundException("Aucune Bid trouvée avec l'ID : " + bid.getId());
     }
 
-    /**
-     * Convertit une entité Bid en objet BidDto à l'aide de ModelMapper.
-     *
-     * @param bidEntity l'entité Bid à convertir
-     * @return l'objet BidDto converti
-     * @throws IllegalArgumentException si bidEntity est null
-     */
-    public BidDto convertEntityToDto(Bid bidEntity) {
-        if (bidEntity == null) {
-            throw new IllegalArgumentException("Le Bid ne peut pas être null");
-        }
-        return modelMapper.map(bidEntity, BidDto.class);
-    }
 }

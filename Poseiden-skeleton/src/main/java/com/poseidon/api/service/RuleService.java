@@ -1,7 +1,6 @@
 package com.poseidon.api.service;
 
 import com.poseidon.api.model.Rule;
-import com.poseidon.api.model.dto.RuleDto;
 import com.poseidon.api.repositories.RuleRepository;
 import org.apache.commons.lang3.StringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -27,18 +26,6 @@ public class RuleService {
 
     @Autowired
     ModelMapper modelMapper;
-
-    public List<Rule> findAllRules() {
-        return ruleNameRepository.findAll();
-    }
-
-    public Rule findRuleById(Long id) {
-        Optional<Rule> ruleName = ruleNameRepository.findRuleById(id);
-        if (id != null && ruleName.isPresent()) {
-            return ruleName.get();
-        }
-        throw new UsernameNotFoundException("Could not find rule with id : " + id);
-    }
 
     /**
      * Crée une nouvelle règle dans la base de données à partir d'une entité de règle donnée.
@@ -162,31 +149,4 @@ public class RuleService {
         }
     }
 
-    /**
-     * Convertit un objet RuleDto en un objet Rule à l'aide de ModelMapper.
-     *
-     * @param ruleDto le RuleDto à convertir
-     * @return l'objet Rule converti
-     * @throws NullPointerException si le RuleDto fourni en entrée est null
-     */
-    public Rule convertDtoToEntity(RuleDto ruleDto) throws NullPointerException {
-        if (ruleDto == null) {
-            throw new NullPointerException("Le DTO de la règle est null.");
-        }
-        return modelMapper.map(ruleDto, Rule.class);
-    }
-
-    /**
-     * Convertit un objet Rule en un objet RuleDto à l'aide de ModelMapper.
-     *
-     * @param ruleEntity le Rule à convertir
-     * @return l'objet RuleDto converti
-     * @throws NullPointerException si le Rule fourni en entrée est null
-     */
-    public RuleDto convertEntityToDto(Rule ruleEntity) throws NullPointerException {
-        if (ruleEntity == null) {
-            throw new NullPointerException("L'entité de la règle est null.");
-        }
-        return modelMapper.map(ruleEntity, RuleDto.class);
-    }
 }

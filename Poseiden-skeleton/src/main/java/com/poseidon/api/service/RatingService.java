@@ -1,7 +1,6 @@
 package com.poseidon.api.service;
 
 import com.poseidon.api.model.Rating;
-import com.poseidon.api.model.dto.RatingDto;
 import com.poseidon.api.repositories.RatingRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -22,20 +21,6 @@ public class RatingService {
 
     @Autowired
     ModelMapper modelMapper;
-
-    public List<Rating> findAllRatings() {
-        return ratingRepository.findAll();
-    }
-
-    public Rating findRatingById(Long id) {
-        Rating finalRating = null;
-
-        Optional<Rating> rating = ratingRepository.findRatingById(id);
-        if (id != null && rating.isPresent()) {
-            finalRating = rating.get();
-        }
-        return finalRating;
-    }
 
     /**
      * Crée un objet Rating dans la base de données.
@@ -106,31 +91,4 @@ public class RatingService {
         }
     }
 
-    /**
-     * Convertit un objet RatingDto en objet Rating.
-     *
-     * @param ratingDto l'objet RatingDto à convertir (ne doit pas être null)
-     * @return l'objet Rating converti
-     * @throws IllegalArgumentException si ratingDto est null
-     */
-    public Rating convertDtoToEntity(RatingDto ratingDto) {
-        if (ratingDto == null) {
-            throw new IllegalArgumentException("Le paramètre ratingDto ne doit pas être null");
-        }
-        return modelMapper.map(ratingDto, Rating.class);
-    }
-
-    /**
-     * Convertit un objet Rating en objet RatingDto.
-     *
-     * @param ratingEntity l'objet Rating à convertir (ne doit pas être null)
-     * @return l'objet RatingDto converti
-     * @throws IllegalArgumentException si ratingEntity est null
-     */
-    public RatingDto convertEntityToDto(Rating ratingEntity) {
-        if (ratingEntity == null) {
-            throw new IllegalArgumentException("Le paramètre ratingEntity ne doit pas être null");
-        }
-        return modelMapper.map(ratingEntity, RatingDto.class);
-    }
 }

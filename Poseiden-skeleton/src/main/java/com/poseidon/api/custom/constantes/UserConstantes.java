@@ -1,6 +1,14 @@
 package com.poseidon.api.custom.constantes;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+
 public class UserConstantes {
+
+    @Autowired
+    private static Environment env;
+
+    //Logs
     public static final String USER_UPDATED_LOG_MESSAGE = "[UserConfiguration] Updated user with username : %s";
     public static final String USER_NOT_FOUND_EXCEPTION_MESSAGE = "Impossible de trouver l'utilisateur avec l'identifiant : %s";
     public static final String USER_CREATED_LOG_MESSAGE = "[UserConfiguration] New user with username : %s and role %s has been created";

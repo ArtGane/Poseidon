@@ -6,11 +6,9 @@ import com.poseidon.api.custom.exceptions.curve.InvalidCurvePointException;
 import com.poseidon.api.model.CurvePoint;
 import com.poseidon.api.repositories.CurvePointRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -42,7 +40,7 @@ public class CurvePointService {
             throw new InvalidCurvePointException("Les valeurs de term et de valeur doivent être positives");
         }
 
-        if (!curvePointRepository.findCurvePointById(curvePoint.getId()).isPresent()) {
+        if (!curvePointRepository.findById(curvePoint.getId()).isPresent()) {
             curvePointRepository.save(curvePoint);
             log.info("[CurveConfiguration] Création d'un nouveau CurvePoint avec ID : " + curvePoint.getCurveId() + ", terme : " + curvePoint.getTerm() + " et valeur : " + curvePoint.getValue());
             return true;
@@ -67,20 +65,21 @@ public class CurvePointService {
         if (curvePointEntityUpdated.getCurveId() == null || curvePointEntityUpdated.getTerm() == null || curvePointEntityUpdated.getValue() == null || curvePointEntityUpdated.getAsOfDate() == null || curvePointEntityUpdated.getCreationDate() == null) {
             throw new InvalidCurvePointException("Le CurvePoint doit avoir tous les champs requis");
         }
-        Optional<CurvePoint> curvePointOptional = curvePointRepository.findCurvePointById(id);
-        if (curvePointOptional.isEmpty()) {
+        Optional<CurvePoint> curvePointOptional = curvePointRepository.findById(id);
+        if (!curvePointOptional.isEmpty()) {
+            CurvePoint curvePoint = curvePointOptional.get();
+            curvePoint.setCurveId(curvePointEntityUpdated.getCurveId());
+            curvePoint.setTerm(curvePointEntityUpdated.getTerm());
+            curvePoint.setValue(curvePointEntityUpdated.getValue());
+            curvePoint.setAsOfDate(curvePointEntityUpdated.getAsOfDate());
+            curvePoint.setCreationDate(curvePointEntityUpdated.getCreationDate());
+            curvePointRepository.save(curvePoint);
+            log.info("[CurveConfiguration] CurvePoint mis à jour " + curvePointEntityUpdated.getCurveId() + " avec la maturité " + curvePointEntityUpdated.getTerm() + " et la valeur " + curvePointEntityUpdated.getValue());
+
+            return true;
+        } else {
             throw new CurvePointNotFoundException("Le CurvePoint avec l'ID " + id + " n'a pas été trouvé");
         }
-        CurvePoint curvePoint = curvePointOptional.get();
-        curvePoint.setCurveId(curvePointEntityUpdated.getCurveId());
-        curvePoint.setTerm(curvePointEntityUpdated.getTerm());
-        curvePoint.setValue(curvePointEntityUpdated.getValue());
-        curvePoint.setAsOfDate(curvePointEntityUpdated.getAsOfDate());
-        curvePoint.setCreationDate(curvePointEntityUpdated.getCreationDate());
-        curvePointRepository.save(curvePoint);
-        log.info("[CurveConfiguration] CurvePoint mis à jour " + curvePointEntityUpdated.getCurveId() + " avec la maturité " + curvePointEntityUpdated.getTerm() + " et la valeur " + curvePointEntityUpdated.getValue());
-
-        return true;
     }
 
     /**
@@ -97,11 +96,11 @@ public class CurvePointService {
             throw new IllegalArgumentException("ID invalide: " + id);
         }
 
-        Optional<CurvePoint> curvePoint = curvePointRepository.findCurvePointById(id);
+        Optional<CurvePoint> curvePoint = curvePointRepository.findById(id);
         if (curvePoint.isPresent() && curvePoint.get().getId().equals(id)) {
             try {
-                CurvePoint cp = curvePoint.get();
-                curvePointRepository.delete(cp);
+                CurvePoint curvePoint1 = curvePoint.get();
+                curvePointRepository.delete(curvePoint1);
                 log.info("[CurveConfiguration] CurvePoint avec l'ID: " + id + " bien supprimé");
                 return true;
             } catch (Exception ex) {

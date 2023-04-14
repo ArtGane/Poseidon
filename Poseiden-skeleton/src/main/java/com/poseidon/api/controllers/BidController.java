@@ -1,7 +1,7 @@
 package com.poseidon.api.controllers;
 
-import com.poseidon.api.config.Utils;
 import com.poseidon.api.custom.constantes.BidConstantes;
+import com.poseidon.api.custom.exceptions.bid.BidAlreadyExistsException;
 import com.poseidon.api.custom.exceptions.bid.BidCreationException;
 import com.poseidon.api.custom.exceptions.bid.BidNotFoundException;
 import com.poseidon.api.model.Bid;
@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
+import java.util.Optional;
 
 
 @Controller
@@ -32,7 +33,7 @@ public class BidController {
 
     @RequestMapping("/bidList/list")
     public String home(Model model) {
-        model.addAttribute("bids", Utils.findAll(bidRepository));
+        model.addAttribute("bids", bidRepository.findAll());
 
         return "bidList/list";
     }
@@ -43,7 +44,7 @@ public class BidController {
     }
 
     @PostMapping("/bidList/validate")
-    public String createBid(@Valid Bid bid, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+    public String createBid(@Valid Bid bid, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) throws BidAlreadyExistsException {
         if (bindingResult.hasErrors()) {
             return "bidList/add";
         }
@@ -60,7 +61,7 @@ public class BidController {
     @GetMapping("/bidList/update/{id}")
     public String showUpdateForm(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) throws ChangeSetPersister.NotFoundException {
         try {
-            Bid bidToUpdate = Utils.findById(id, bidRepository);
+            Optional<Bid> bidToUpdate = bidRepository.findById(id);
             model.addAttribute("bid", bidToUpdate);
             return "bidList/update";
         } catch (BidNotFoundException e) {
@@ -71,7 +72,7 @@ public class BidController {
 
     @PostMapping("/bidList/update/{id}")
     public String updateBid(@PathVariable("id") Long id, @Valid Bid bid,
-                            BindingResult result, Model model, RedirectAttributes redirectAttributes) {
+                            BindingResult result, Model model, RedirectAttributes redirectAttributes) throws ChangeSetPersister.NotFoundException {
 
         if (result.hasErrors()) {
             return "bidList/update";
@@ -92,12 +93,11 @@ public class BidController {
     }
 
     @GetMapping("/bidList/delete/{id}")
-    public String deleteBid(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) throws ChangeSetPersister.NotFoundException {
+    public String deleteBid(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
         try {
-            Bid bidToDelete = Utils.findById(id, bidRepository);
-            bidService.deleteBid(bidToDelete);
+            bidService.deleteBid(id);
             redirectAttributes.addFlashAttribute("message", String.format("Bid with id " + id + " was successfully deleted"));
-            model.addAttribute("bids", Utils.findAll(bidRepository));
+            model.addAttribute("bids", bidRepository.findAll());
         } catch (BidNotFoundException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:/bidList/list";

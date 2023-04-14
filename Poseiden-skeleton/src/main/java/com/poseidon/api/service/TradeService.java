@@ -6,11 +6,9 @@ import com.poseidon.api.custom.exceptions.trade.InvalidTradeException;
 import com.poseidon.api.model.Trade;
 import com.poseidon.api.repositories.TradeRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -19,9 +17,6 @@ public class TradeService {
 
     @Autowired
     TradeRepository tradeRepository;
-
-    @Autowired
-    ModelMapper modelMapper;
 
     /**
      * Crée un nouvel objet Trade et l'ajoute à la base de données.

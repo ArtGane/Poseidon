@@ -1,17 +1,17 @@
 package com.poseidon.api.model;
 
-import com.poseidon.api.repositories.customconfig.Identifiable;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "rating")
 @NoArgsConstructor
+@AllArgsConstructor
 @Data
-public class Rating implements Identifiable<Long> {
+public class Rating {
 
     @Id
     @Column(name = "Id")
@@ -30,15 +30,4 @@ public class Rating implements Identifiable<Long> {
     @Column(name = "order_number")
     Integer orderNumber;
 
-    public Rating( String moodysRating, String sandPRating, String fitchRating, Integer orderNumber) {
-        this.moodysRating = moodysRating;
-        this.sandPRating = sandPRating;
-        this.fitchRating = fitchRating;
-        this.orderNumber = orderNumber;
-    }
-
-    @Override
-    public Long getId() {
-        return id;
-    }
 }

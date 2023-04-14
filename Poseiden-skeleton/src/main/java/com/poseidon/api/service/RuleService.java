@@ -10,7 +10,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -24,8 +23,6 @@ public class RuleService {
     @Autowired
     private MessageSource messageSource;
 
-    @Autowired
-    ModelMapper modelMapper;
 
     /**
      * Crée une nouvelle règle dans la base de données à partir d'une entité de règle donnée.
@@ -35,35 +32,34 @@ public class RuleService {
      * @throws UsernameNotFoundException si une règle avec le même identifiant existe déjà dans la base de données
      * @throws IllegalArgumentException si l'entité de règle est null ou si l'un des champs requis est null ou vide
      */
-    public boolean createRule(Rule ruleEntity) throws UsernameNotFoundException, IllegalArgumentException {
-        if (ruleEntity == null) {
-            throw new IllegalArgumentException("Impossible de créer la règle : l'entité de règle est null.");
-        }
+    public boolean createRule(Rule ruleEntity) throws UsernameNotFoundException, IllegalArgumentException {if (ruleEntity == null) {
+        throw new IllegalArgumentException(messageSource.getMessage("create.rule.null", null, Locale.getDefault()));
+    }
         if (StringUtils.isEmpty(ruleEntity.getName())) {
-            throw new IllegalArgumentException("Impossible de créer la règle : le nom de la règle est null ou vide.");
+            throw new IllegalArgumentException(messageSource.getMessage("create.rule.name.null", null, Locale.getDefault()));
         }
         if (StringUtils.isEmpty(ruleEntity.getDescription())) {
-            throw new IllegalArgumentException("Impossible de créer la règle : la description de la règle est null ou vide.");
+            throw new IllegalArgumentException(messageSource.getMessage("create.rule.description.null", null, Locale.getDefault()));
         }
         if (StringUtils.isEmpty(ruleEntity.getJson())) {
-            throw new IllegalArgumentException("Impossible de créer la règle : le JSON de la règle est null ou vide.");
+            throw new IllegalArgumentException(messageSource.getMessage("create.rule.json.null", null, Locale.getDefault()));
         }
         if (StringUtils.isEmpty(ruleEntity.getTemplate())) {
-            throw new IllegalArgumentException("Impossible de créer la règle : le modèle de la règle est null ou vide.");
+            throw new IllegalArgumentException(messageSource.getMessage("create.rule.template.null", null, Locale.getDefault()));
         }
         if (StringUtils.isEmpty(ruleEntity.getSqlStr())) {
-            throw new IllegalArgumentException("Impossible de créer la règle : la chaîne SQL de la règle est null ou vide.");
+            throw new IllegalArgumentException(messageSource.getMessage("create.rule.sqlstr.null", null, Locale.getDefault()));
         }
         if (StringUtils.isEmpty(ruleEntity.getSqlPart())) {
-            throw new IllegalArgumentException("Impossible de créer la règle : la partie SQL de la règle est null ou vide.");
+            throw new IllegalArgumentException(messageSource.getMessage("create.rule.sqlpart.null", null, Locale.getDefault()));
         }
-        if (!ruleNameRepository.findRuleById(ruleEntity.getId()).isPresent()) {
+        if (!ruleNameRepository.findById(ruleEntity.getId()).isPresent()) {
             ruleNameRepository.save(ruleEntity);
-            log.info("[RuleConfiguration] Une nouvelle règle a été créée avec l'identifiant '{}' et le nom '{}'", ruleEntity.getId(),
-                    ruleEntity.getName());
+            log.info(messageSource.getMessage("create.rule.success", new Object[] {ruleEntity.getId(), ruleEntity.getName()}, Locale.getDefault()));
             return true;
         }
-        throw new UsernameNotFoundException("Impossible de créer la règle : une règle avec le même identifiant existe déjà.");
+        throw new UsernameNotFoundException(messageSource.getMessage("create.rule.id.exist", null, Locale.getDefault()));
+
     }
 
     /**
@@ -77,47 +73,41 @@ public class RuleService {
      */
     public boolean updateRule(Long id, Rule ruleEntityUpdated) throws UsernameNotFoundException, IllegalArgumentException {
         if (id == null) {
-            throw new IllegalArgumentException("Impossible de mettre à jour la règle : l'ID de la règle est null.");
-        }
-
-        Optional<Rule> ruleName = ruleNameRepository.findRuleById(id);
-        if (!ruleName.isPresent()) {
-            throw new UsernameNotFoundException("Impossible de trouver la règle avec l'ID : " + id);
+            throw new IllegalArgumentException(messageSource.getMessage("update.rule.id.null", null, Locale.getDefault()));
         }
 
         if (ruleEntityUpdated == null) {
-            throw new IllegalArgumentException("Impossible de mettre à jour la règle : les informations mises à jour sont null.");
+            throw new IllegalArgumentException(messageSource.getMessage("update.rule.updatedInfo.null", null, Locale.getDefault()));
         }
 
         if (StringUtils.isEmpty(ruleEntityUpdated.getName())) {
-            throw new IllegalArgumentException("Impossible de mettre à jour la règle : le nom de la règle est null ou vide.");
+            throw new IllegalArgumentException(messageSource.getMessage("update.rule.name.null", null, Locale.getDefault()));
         }
 
         if (StringUtils.isEmpty(ruleEntityUpdated.getDescription())) {
-            throw new IllegalArgumentException("Impossible de mettre à jour la règle : la description de la règle est null ou vide.");
+            throw new IllegalArgumentException(messageSource.getMessage("update.rule.description.null", null, Locale.getDefault()));
         }
 
         if (StringUtils.isEmpty(ruleEntityUpdated.getJson())) {
-            throw new IllegalArgumentException("Impossible de mettre à jour la règle : la structure JSON de la règle est null ou vide.");
+            throw new IllegalArgumentException(messageSource.getMessage("update.rule.json.null", null, Locale.getDefault()));
         }
 
         if (StringUtils.isEmpty(ruleEntityUpdated.getTemplate())) {
-            throw new IllegalArgumentException("Impossible de mettre à jour la règle : le modèle de la règle est null ou vide.");
+            throw new IllegalArgumentException(messageSource.getMessage("update.rule.template.null", null, Locale.getDefault()));
         }
 
         if (StringUtils.isEmpty(ruleEntityUpdated.getSqlStr())) {
-            throw new IllegalArgumentException("Impossible de mettre à jour la règle : la requête SQL de la règle est null ou vide.");
+            throw new IllegalArgumentException(messageSource.getMessage("update.rule.sqlstr.null", null, Locale.getDefault()));
         }
 
         if (StringUtils.isEmpty(ruleEntityUpdated.getSqlPart())) {
-            throw new IllegalArgumentException("Impossible de mettre à jour la règle : la partie SQL de la règle est null ou vide.");
+            throw new IllegalArgumentException(messageSource.getMessage("update.rule.sqlpart.null", null, Locale.getDefault()));
         }
 
         ruleEntityUpdated.setId(id);
         ruleNameRepository.save(ruleEntityUpdated);
 
-        log.info("[RuleConfiguration] Règle mise à jour avec succès - ID : '{}' Nom : '{}'", ruleEntityUpdated.getId(),
-                ruleEntityUpdated.getName());
+        log.info(messageSource.getMessage("update.rule.success", new Object[] {ruleEntityUpdated.getId(), ruleEntityUpdated.getName()}, Locale.getDefault()));
         return true;
     }
 
@@ -135,7 +125,7 @@ public class RuleService {
             throw new IllegalArgumentException(messageSource.getMessage("delete.rule.id.null", null, Locale.getDefault()));
         }
 
-        Optional<Rule> ruleOptional = ruleNameRepository.findRuleById(id);
+        Optional<Rule> ruleOptional = ruleNameRepository.findById(id);
         if (!ruleOptional.isPresent()) {
             throw new UsernameNotFoundException(messageSource.getMessage("delete.rule.notfound", new Object[] {id}, Locale.getDefault()));
         }

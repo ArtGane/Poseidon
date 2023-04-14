@@ -1,10 +1,8 @@
 package com.poseidon.api.model;
 
-import com.poseidon.api.repositories.customconfig.Identifiable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -15,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Trade implements Identifiable<Long> {
+public class Trade {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
@@ -35,10 +33,6 @@ public class Trade implements Identifiable<Long> {
         this.action = action;
     }
 
-    @Override
-    public Long getId() {
-        return id;
-    }
 
     @Column(name = "buy_quantity")
     Double buyQuantity;

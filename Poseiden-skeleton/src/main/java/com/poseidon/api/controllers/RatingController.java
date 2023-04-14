@@ -1,6 +1,5 @@
 package com.poseidon.api.controllers;
 
-import com.poseidon.api.config.Utils;
 import com.poseidon.api.custom.exceptions.rating.RatingDeletionException;
 import com.poseidon.api.model.Rating;
 import com.poseidon.api.repositories.RatingRepository;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
+import java.util.Optional;
 
 @Controller
 public class RatingController {
@@ -29,7 +29,7 @@ public class RatingController {
 
     @RequestMapping("/rating/list")
     public String home(Model model) {
-        model.addAttribute("ratings", Utils.findAll(ratingRepository));
+        model.addAttribute("ratings", ratingRepository.findAll());
         return "rating/list";
     }
 
@@ -51,7 +51,7 @@ public class RatingController {
         if (created) {
             redirectAttributes.addFlashAttribute("message",
                     String.format("Le rating avec l'id %d a été créé avec succès", rating.getId()));
-            model.addAttribute("ratings", Utils.findAll(ratingRepository));
+            model.addAttribute("ratings", ratingRepository.findAll());
             return "redirect:/rating/list";
         } else {
             model.addAttribute("error", "Échec de la création du rating");
@@ -67,7 +67,7 @@ public class RatingController {
             return "redirect:/rating/list";
         }
 
-        Rating ratingToUpdate = Utils.findById(id, ratingRepository);
+        Optional<Rating> ratingToUpdate = ratingRepository.findById(id);
         if (ratingToUpdate == null) {
             redirectAttributes.addFlashAttribute("message", "Aucun rating trouvé avec l'ID " + id);
             return "redirect:/rating/list";
@@ -96,7 +96,8 @@ public class RatingController {
             redirectAttributes.addFlashAttribute("message",
                     String.format("La notation avec l'ID '%d' a été mise à jour avec succès", id));
 
-            model.addAttribute("ratings", Utils.findAll(ratingRepository));
+            model.addAttribute("ratings",
+                    ratingRepository.findAll());
 
             return "redirect:/rating/list";
         } catch (IllegalArgumentException | DataAccessException e) {

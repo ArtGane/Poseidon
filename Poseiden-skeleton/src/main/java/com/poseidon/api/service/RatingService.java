@@ -3,13 +3,11 @@ package com.poseidon.api.service;
 import com.poseidon.api.model.Rating;
 import com.poseidon.api.repositories.RatingRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -19,9 +17,6 @@ public class RatingService {
     @Autowired
     RatingRepository ratingRepository;
 
-    @Autowired
-    ModelMapper modelMapper;
-
     /**
      * Crée un objet Rating dans la base de données.
      * @param rating L'objet Rating à créer.
@@ -30,7 +25,7 @@ public class RatingService {
      */
     public boolean createRating(Rating rating) {
         try {
-            if (rating != null && !ratingRepository.findRatingById(rating.getId()).isPresent()) {
+            if (rating != null && !ratingRepository.findById(rating.getId()).isPresent()) {
                 ratingRepository.save(rating);
                 log.info("[RatingConfiguration] Création d'un nouveau rating avec l'ID " + rating.getId() + " pour le numéro de commande " + rating.getOrderNumber());
                 return true;
@@ -52,7 +47,7 @@ public class RatingService {
      */
     public boolean updateRating(Long id, Rating ratingUpdated) throws DataAccessException {
         try {
-            Optional<Rating> rating = ratingRepository.findRatingById(id);
+            Optional<Rating> rating = ratingRepository.findById(id);
             if (id != null && rating.isPresent()) {
                 ratingUpdated.setId(id);
                 ratingRepository.save(ratingUpdated);
@@ -77,7 +72,7 @@ public class RatingService {
      *         ou si l'objet Rating à supprimer n'est pas trouvé dans la base de données
      */
     public boolean deleteRating(Long id) throws DataAccessException {
-        Optional<Rating> rating = ratingRepository.findRatingById(id);
+        Optional<Rating> rating = ratingRepository.findById(id);
         if (id == null || rating.isEmpty()) {
             return false;
         }

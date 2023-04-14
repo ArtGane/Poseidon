@@ -1,6 +1,5 @@
 package com.poseidon.api.controllers;
 
-import com.poseidon.api.config.Utils;
 import com.poseidon.api.model.Rule;
 import com.poseidon.api.repositories.RuleRepository;
 import com.poseidon.api.service.RuleService;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
+import java.util.Optional;
 
 @Controller
 public class RuleController {
@@ -26,7 +26,7 @@ public class RuleController {
 
     @RequestMapping("/ruleName/list")
     public String home(Model model) {
-        model.addAttribute("rules", Utils.findAll(ruleRepository));
+        model.addAttribute("rules", ruleRepository.findAll());
         return "ruleName/list";
     }
 
@@ -42,7 +42,7 @@ public class RuleController {
             ruleService.createRule(rule);
             redirectAttributes.addFlashAttribute("message",
                     String.format("Rule with id '%d' was successfully created", rule.getId()));
-            model.addAttribute("rules", Utils.findAll(ruleRepository));
+            model.addAttribute("rules", ruleRepository.findAll());
             return "redirect:/ruleName/list";
         }
         return "ruleName/add";
@@ -52,7 +52,7 @@ public class RuleController {
     public String showUpdateForm(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
 
         try {
-            Rule ruleToUpdate = Utils.findById(id, ruleRepository);
+            Optional<Rule> ruleToUpdate = ruleRepository.findById(id);
             model.addAttribute("rule", ruleToUpdate);
         } catch (Exception error) {
             redirectAttributes.addFlashAttribute("message", error.getMessage());
@@ -74,7 +74,7 @@ public class RuleController {
         redirectAttributes.addFlashAttribute("message",
                 String.format("Rule with id '%d' was successfully updated", id));
 
-        model.addAttribute("rules", Utils.findAll(ruleRepository));
+        model.addAttribute("rules", ruleRepository.findAll());
 
         return "redirect:/ruleName/list";
     }
@@ -91,7 +91,7 @@ public class RuleController {
         redirectAttributes.addFlashAttribute("message",
                 String.format("Rule with id '%d' was successfully deleted", id));
 
-        model.addAttribute("rules", Utils.findAll(ruleRepository));
+        model.addAttribute("rules", ruleRepository.findAll());
 
         return "redirect:/ruleName/list";
     }

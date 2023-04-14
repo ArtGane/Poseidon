@@ -5,13 +5,12 @@ import com.poseidon.api.model.Role;
 import com.poseidon.api.model.User;
 import com.poseidon.api.repositories.UserRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,10 +24,7 @@ public class UserService implements UserDetailsService {
     @Autowired
     UserRepository userRepository;
 
-    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
-    @Autowired
-    ModelMapper modelMapper;
+    SCryptPasswordEncoder passwordEncoder = new SCryptPasswordEncoder();
 
 
     /**
@@ -40,11 +36,15 @@ public class UserService implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> user = userRepository.findByUsername(username);
-        if (user.isPresent()) {
-            return new User(user.get());
+        try {
+            Optional<User> user = userRepository.findByUsername(username);
+            if (user.isPresent()) {
+                return new User(user.get());
+            }
+            throw new UsernameNotFoundException("User not found : " + username);
+        } catch (NullPointerException ex) {
+            throw new UsernameNotFoundException("User not found : " + username);
         }
-        throw new UsernameNotFoundException("User not found : " + username);
     }
 
     /**
@@ -93,7 +93,7 @@ public class UserService implements UserDetailsService {
         String password = user.getPassword();
         Objects.requireNonNull(password, "Le mot de passe ne peut pas être null");
 
-        if (passwordConstraints(password)) {
+        if (!passwordConstraints(password)) {
             throw new IllegalArgumentException("Le mot de passe doit contenir au moins une lettre majuscule, un chiffre et 8 caractères");
         }
 
@@ -129,7 +129,7 @@ public class UserService implements UserDetailsService {
         String password = userEntityUpdated.getPassword();
         Objects.requireNonNull(password, "Le mot de passe ne peut pas être null");
 
-        if (passwordConstraints(password)) {
+        if (!passwordConstraints(password)) {
             throw new IllegalArgumentException("Le mot de passe doit contenir au moins une lettre majuscule, un chiffre et 8 caractères");
         }
 

@@ -1,20 +1,22 @@
 package com.poseidon.api.model;
 
-import com.poseidon.api.repositories.customconfig.Identifiable;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.security.Timestamp;
 
 
 @Entity
 @Table(name = "bid")
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
-public class Bid implements Identifiable<Long> {
+public class Bid {
 
     @Id
     @Column
@@ -22,6 +24,7 @@ public class Bid implements Identifiable<Long> {
     private Long id;
 
     @Column
+    @NotBlank
     private String account;
 
     @Column
@@ -30,30 +33,15 @@ public class Bid implements Identifiable<Long> {
     @Column(name = "bid_quantity")
     private Double bidQuantity;
 
-
-    public Bid(String account, String type, Double bidQuantity) {
+    // Besoin de ce constructeur pour les tests
+    public Bid(Long id, String account, String type, Double bidQuantity) {
+        this.id = id;
         this.account = account;
         this.type = type;
         this.bidQuantity = bidQuantity;
     }
 
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
+    // useless //
 
     @Column(name = "ask_quantity", nullable = true)
     private Double askQuantity;
@@ -105,4 +93,5 @@ public class Bid implements Identifiable<Long> {
 
     @Column(nullable = true)
     private String side;
+
 }

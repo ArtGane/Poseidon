@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "rating")
@@ -14,20 +15,21 @@ import javax.persistence.*;
 public class Rating {
 
     @Id
-    @Column(name = "Id")
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    Long id;
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(name = "moodys_rating")
-    String moodysRating;
+    @NotBlank(message = "Moody's rating is mandatory")
+    private String moodysRating;
 
     @Column(name = "sandp_rating")
-    String sandPRating;
+    private String sandPRating;
 
     @Column(name = "fitch_rating")
-    String fitchRating;
+    private String fitchRating;
 
     @Column(name = "order_number")
-    Integer orderNumber;
+    private Integer orderNumber;
 
 }

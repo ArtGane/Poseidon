@@ -1,15 +1,13 @@
 package com.poseidon.api.service;
 
 import com.poseidon.api.model.Rating;
-import com.poseidon.api.repositories.RatingRepository;
-import org.junit.jupiter.api.BeforeEach;
+import com.poseidon.api.repository.RatingRepository;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.Optional;
@@ -25,7 +23,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class RatingServiceTest {
 
     @InjectMocks
@@ -116,7 +114,7 @@ class RatingServiceTest {
         Rating rating = new Rating();
         rating.setId(ratingId);
         rating.setOrderNumber(Integer.valueOf("123"));
-
+        when(ratingRepository.findById(ratingId)).thenReturn(Optional.of(rating));
 
         boolean result = ratingService.deleteRating(ratingId);
 

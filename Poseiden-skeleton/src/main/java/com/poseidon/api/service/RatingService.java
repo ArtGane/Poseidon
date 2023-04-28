@@ -1,7 +1,7 @@
 package com.poseidon.api.service;
 
 import com.poseidon.api.model.Rating;
-import com.poseidon.api.repositories.RatingRepository;
+import com.poseidon.api.repository.RatingRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;

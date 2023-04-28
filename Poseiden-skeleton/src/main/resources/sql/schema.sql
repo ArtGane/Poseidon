@@ -47,9 +47,9 @@ CREATE TABLE bid (
 -- Table structure for table `curvepoint`
 CREATE TABLE curvepoint (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  curve_id BIGINT UNSIGNED DEFAULT NULL,
-  term DOUBLE DEFAULT NULL,
-  value DOUBLE DEFAULT NULL,
+  curve_id BIGINT UNSIGNED DEFAULT NOT NULL,
+  term DOUBLE DEFAULT NOT NULL,
+  value DOUBLE DEFAULT NOT NULL,
   as_of_date DATETIME DEFAULT NULL,
   creation_date DATETIME DEFAULT NULL,
   PRIMARY KEY (id)
@@ -59,8 +59,8 @@ CREATE TABLE curvepoint (
 -- Table structure for table `rating`
 CREATE TABLE rating (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  fitch_rating VARCHAR(255) DEFAULT NULL,
-  moodys_rating VARCHAR(255) DEFAULT NULL,
+  fitch_rating VARCHAR(255) DEFAULT NOT NULL,
+  moodys_rating VARCHAR(255) DEFAULT NOT NULL,
   sandp_rating VARCHAR(255) DEFAULT NULL,
   order_number INT DEFAULT NULL,
   PRIMARY KEY (id)
@@ -70,8 +70,8 @@ CREATE TABLE rating (
 -- Table structure for table `rule`
 CREATE TABLE rule (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  name VARCHAR(125) DEFAULT NULL,
-  description VARCHAR(125) DEFAULT NULL,
+  name VARCHAR(125) DEFAULT NOT NULL,
+  description VARCHAR(125) DEFAULT NOT NULL,
   json VARCHAR(125) DEFAULT NULL,
   template VARCHAR(512) DEFAULT NULL,
   sql_part VARCHAR(255) DEFAULT NULL,
@@ -110,16 +110,9 @@ CONSTRAINT fk_trader FOREIGN KEY (trader_id) REFERENCES users (id)
 -- Table structure for table users
 CREATE TABLE users (
 id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-username VARCHAR(125) DEFAULT NULL,
-password VARCHAR(125) DEFAULT NULL,
+username VARCHAR(125) DEFAULT NOT NULL,
+password VARCHAR(125) DEFAULT NOT NULL,
 fullname VARCHAR(125) DEFAULT NULL,
-role ENUM('ADMIN', 'TRADER') DEFAULT NULL,
+role ENUM('ADMIN', 'USER') DEFAULT NULL,
 PRIMARY KEY (id)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Table containing all users';
-
--- Password's admin : Poseidon@0
--- Password's user : Jelly*4
-
-INSERT users (username, password, fullname, role) VALUES
-	 ('poseidon','$2y$10$XgJUMSVrwQTTsMaW9LayreyzVpIyx.t4tRqwJmURSfB0nslHLVKH6','Poseidon Administration','admin'),
-	 ('jelly','$2y$10$d4xPXdA0BN3r30VXjVSqGe5Kh0k6vlHKzgUPJNkw0fQJxereY2KrG','Jelly Fish','user');

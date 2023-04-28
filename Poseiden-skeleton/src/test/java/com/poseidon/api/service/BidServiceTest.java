@@ -4,23 +4,23 @@ import com.poseidon.api.custom.exceptions.bid.BidAlreadyExistsException;
 import com.poseidon.api.custom.exceptions.bid.BidNotFoundException;
 import com.poseidon.api.custom.exceptions.bid.InvalidBidException;
 import com.poseidon.api.model.Bid;
-import com.poseidon.api.repositories.BidRepository;
+import com.poseidon.api.repository.BidRepository;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class BidServiceTest {
 
     @InjectMocks
@@ -85,7 +85,6 @@ class BidServiceTest {
         Long id = 1L;
         Bid existingBid = new Bid(id, "account1", "type1", 100.0);
         Bid updatedBid = new Bid(id, null, null, null);
-        when(bidRepository.findById(id)).thenReturn(Optional.of(existingBid));
 
         assertThrows(InvalidBidException.class, () -> bidService.updateBid(id, updatedBid));
         verify(bidRepository, never()).findById(id);
@@ -97,7 +96,6 @@ class BidServiceTest {
         Long id = 1L;
         Bid existingBid = new Bid(id, "account1", "type1", 100.0);
         Bid updatedBid = new Bid(id, "account2", "type2", -10.0);
-        when(bidRepository.findById(id)).thenReturn(Optional.of(existingBid));
 
         assertThrows(InvalidBidException.class, () -> bidService.updateBid(id, updatedBid));
         verify(bidRepository, never()).findById(id);
@@ -152,8 +150,6 @@ class BidServiceTest {
         bid.setAccount("account1");
         bid.setType("type1");
         bid.setBidQuantity(10.0);
-
-        doThrow(new RuntimeException()).when(bidRepository).delete(bid);
 
         assertThrows(RuntimeException.class, () -> bidService.deleteBid(bid.getId()));
     }

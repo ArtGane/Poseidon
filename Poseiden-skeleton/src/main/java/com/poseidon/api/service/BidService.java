@@ -4,7 +4,7 @@ import com.poseidon.api.custom.exceptions.bid.BidAlreadyExistsException;
 import com.poseidon.api.custom.exceptions.bid.BidNotFoundException;
 import com.poseidon.api.custom.exceptions.bid.InvalidBidException;
 import com.poseidon.api.model.Bid;
-import com.poseidon.api.repositories.BidRepository;
+import com.poseidon.api.repository.BidRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;

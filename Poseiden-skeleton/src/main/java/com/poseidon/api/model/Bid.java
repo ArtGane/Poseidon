@@ -24,10 +24,11 @@ public class Bid {
     private Long id;
 
     @Column
-    @NotBlank
+    @NotBlank(message = "Account is mandatory")
     private String account;
 
     @Column
+    @NotBlank(message = "Type is mandatory")
     private String type;
 
     @Column(name = "bid_quantity")

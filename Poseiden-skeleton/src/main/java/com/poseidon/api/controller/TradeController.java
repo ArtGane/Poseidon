@@ -1,11 +1,10 @@
-package com.poseidon.api.controllers;
+package com.poseidon.api.controller;
 
 import com.poseidon.api.custom.exceptions.rating.TradeAlreadyExistsException;
 import com.poseidon.api.custom.exceptions.trade.TradeValidationException;
 import com.poseidon.api.model.Trade;
-import com.poseidon.api.repositories.TradeRepository;
+import com.poseidon.api.repository.TradeRepository;
 import com.poseidon.api.service.TradeService;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Controller;
@@ -26,8 +25,6 @@ public class TradeController {
     @Autowired
     TradeService tradeService;
 
-    @Autowired
-    ModelMapper modelMapper;
     @Autowired
     private TradeRepository tradeRepository;
 

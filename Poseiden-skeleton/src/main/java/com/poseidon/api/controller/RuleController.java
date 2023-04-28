@@ -1,7 +1,7 @@
-package com.poseidon.api.controllers;
+package com.poseidon.api.controller;
 
 import com.poseidon.api.model.Rule;
-import com.poseidon.api.repositories.RuleRepository;
+import com.poseidon.api.repository.RuleRepository;
 import com.poseidon.api.service.RuleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

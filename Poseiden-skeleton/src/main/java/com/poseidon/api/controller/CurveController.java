@@ -1,9 +1,8 @@
-package com.poseidon.api.controllers;
+package com.poseidon.api.controller;
 
-import com.poseidon.api.config.Utils;
 import com.poseidon.api.custom.exceptions.curve.CurvePointNotFoundException;
 import com.poseidon.api.model.CurvePoint;
-import com.poseidon.api.repositories.CurvePointRepository;
+import com.poseidon.api.repository.CurvePointRepository;
 import com.poseidon.api.service.CurvePointService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;

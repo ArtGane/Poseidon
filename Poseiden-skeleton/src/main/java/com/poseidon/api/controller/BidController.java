@@ -1,11 +1,11 @@
-package com.poseidon.api.controllers;
+package com.poseidon.api.controller;
 
 import com.poseidon.api.custom.constantes.BidConstantes;
 import com.poseidon.api.custom.exceptions.bid.BidAlreadyExistsException;
 import com.poseidon.api.custom.exceptions.bid.BidCreationException;
 import com.poseidon.api.custom.exceptions.bid.BidNotFoundException;
 import com.poseidon.api.model.Bid;
-import com.poseidon.api.repositories.BidRepository;
+import com.poseidon.api.repository.BidRepository;
 import com.poseidon.api.service.BidService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;
@@ -72,7 +72,7 @@ public class BidController {
 
     @PostMapping("/bidList/update/{id}")
     public String updateBid(@PathVariable("id") Long id, @Valid Bid bid,
-                            BindingResult result, Model model, RedirectAttributes redirectAttributes) throws ChangeSetPersister.NotFoundException {
+                            BindingResult result, RedirectAttributes redirectAttributes) throws ChangeSetPersister.NotFoundException {
 
         if (result.hasErrors()) {
             return "bidList/update";

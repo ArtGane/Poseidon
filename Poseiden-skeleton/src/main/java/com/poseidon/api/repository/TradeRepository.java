@@ -1,4 +1,4 @@
-package com.poseidon.api.repositories;
+package com.poseidon.api.repository;
 
 import com.poseidon.api.model.Trade;
 import org.springframework.data.jpa.repository.JpaRepository;

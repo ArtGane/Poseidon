@@ -1,4 +1,4 @@
-package com.poseidon.api.controllers;
+package com.poseidon.api.controller;
 
 import com.poseidon.api.model.User;
 import com.poseidon.api.service.UserService;
@@ -84,7 +84,7 @@ public class UserController {
         }
 
         try {
-            userService.updateUser(id, user);
+            userService.updateUser(id, Optional.of(user));
             model.addAttribute("message",
                     String.format("User '%s' was successfully updated", user.getUsername()));
             model.addAttribute("users", userService.findAllUsers());

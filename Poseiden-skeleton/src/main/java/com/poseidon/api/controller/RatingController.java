@@ -1,8 +1,8 @@
-package com.poseidon.api.controllers;
+package com.poseidon.api.controller;
 
 import com.poseidon.api.custom.exceptions.rating.RatingDeletionException;
 import com.poseidon.api.model.Rating;
-import com.poseidon.api.repositories.RatingRepository;
+import com.poseidon.api.repository.RatingRepository;
 import com.poseidon.api.service.RatingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -77,7 +77,7 @@ public class RatingController {
 
         return "rating/update";
     }
-
+    @PostMapping("/rating/update/{id}")
     public String updateRating(@PathVariable("id") Long id, @Valid Rating rating, BindingResult result,
                                Model model, RedirectAttributes redirectAttributes) {
         try {

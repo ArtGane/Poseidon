@@ -3,14 +3,14 @@ package com.poseidon.api.service;
 import com.poseidon.api.custom.constantes.UserConstantes;
 import com.poseidon.api.model.Role;
 import com.poseidon.api.model.User;
-import com.poseidon.api.repositories.UserRepository;
+import com.poseidon.api.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,7 +24,7 @@ public class UserService implements UserDetailsService {
     @Autowired
     UserRepository userRepository;
 
-    SCryptPasswordEncoder passwordEncoder = new SCryptPasswordEncoder();
+    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 
     /**
@@ -118,15 +118,17 @@ public class UserService implements UserDetailsService {
      * @throws UsernameNotFoundException si l'utilisateur à mettre à jour n'a pas été trouvé dans la base de données ou si le nom d'utilisateur est déjà pris par un autre utilisateur
      * @throws NullPointerException      si l'identifiant de l'utilisateur ou l'objet User mis à jour est null
      */
-    public boolean updateUser(Long userId, User userEntityUpdated) {
+    public boolean updateUser(Long userId, Optional<User> userEntityOptional) {
 
         Objects.requireNonNull(userId, "L'identifiant de l'utilisateur ne peut pas être null");
-        Objects.requireNonNull(userEntityUpdated, "L'utilisateur mis à jour ne peut pas être null");
+        Objects.requireNonNull(userEntityOptional, "L'utilisateur mis à jour ne peut pas être null");
 
-        String username = userEntityUpdated.getUsername();
+        User userEntity = userEntityOptional.orElseThrow(() -> new UsernameNotFoundException("L'utilisateur ne peut pas être null"));
+
+        String username = userEntity.getUsername();
         Objects.requireNonNull(username, "Le nom d'utilisateur ne peut pas être null");
 
-        String password = userEntityUpdated.getPassword();
+        String password = userEntity.getPassword();
         Objects.requireNonNull(password, "Le mot de passe ne peut pas être null");
 
         if (!passwordConstraints(password)) {
@@ -144,9 +146,9 @@ public class UserService implements UserDetailsService {
             throw new UsernameNotFoundException(UserConstantes.USERNAME_ALREADY_TAKEN_EXCEPTION_MESSAGE);
         }
 
-        userEntityUpdated.setId(userId);
-        userEntityUpdated.setPassword(passwordEncoder.encode(password));
-        userRepository.save(userEntityUpdated);
+        userEntity.setId(userId);
+        userEntity.setPassword(passwordEncoder.encode(password));
+        userRepository.save(userEntity);
         log.info(String.format(UserConstantes.USER_UPDATED_LOG_MESSAGE, username));
 
         return true;

@@ -4,13 +4,14 @@ import com.poseidon.api.custom.exceptions.rating.TradeAlreadyExistsException;
 import com.poseidon.api.custom.exceptions.rating.TradeNotFoundException;
 import com.poseidon.api.custom.exceptions.trade.InvalidTradeException;
 import com.poseidon.api.model.Trade;
-import com.poseidon.api.repositories.TradeRepository;
+import com.poseidon.api.repository.TradeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
@@ -20,7 +21,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class TradeServiceTest {
     @Mock
     private TradeRepository tradeRepository;
@@ -42,7 +43,7 @@ class TradeServiceTest {
         trade.setBuyQuantity(100.0);
         trade.setAction("Buy");
 
-        when(tradeRepository.findById(1L)).thenReturn(Optional.of(trade));
+        when(tradeRepository.findById(trade.getId())).thenReturn(Optional.empty());
         boolean created = tradeService.createTrade(trade);
 
         assertTrue(created);
@@ -68,8 +69,6 @@ class TradeServiceTest {
     public void testCreateTradeWithInvalidTrade() {
         Trade trade = new Trade();
         trade.setId(1L);
-
-        when(tradeRepository.findById(1L)).thenReturn(null);
 
         assertThrows(InvalidTradeException.class, () -> {
             tradeService.createTrade(trade);

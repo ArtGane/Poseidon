@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
 
@@ -15,14 +16,16 @@ import java.time.LocalDateTime;
 @Setter
 public class Trade {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id")
-    Long id;
-    @Column(name = "account")
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column
+    @NotBlank(message = "Account is mandatory")
     String account;
-    @Column(name = "type")
+    @Column
+    @NotBlank(message = "Type is mandatory")
     String type;
-    @Column(name = "action")
+    @Column
     String action;
 
 

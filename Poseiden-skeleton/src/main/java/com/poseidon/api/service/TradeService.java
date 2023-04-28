@@ -4,7 +4,7 @@ import com.poseidon.api.custom.exceptions.rating.TradeAlreadyExistsException;
 import com.poseidon.api.custom.exceptions.rating.TradeNotFoundException;
 import com.poseidon.api.custom.exceptions.trade.InvalidTradeException;
 import com.poseidon.api.model.Trade;
-import com.poseidon.api.repositories.TradeRepository;
+import com.poseidon.api.repository.TradeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,12 +41,14 @@ public class TradeService {
             throw new InvalidTradeException("La quantité d'achat doit être positive");
         }
 
-        if (!tradeRepository.findById(trade.getId()).isPresent()) {
-            tradeRepository.save(trade);
-            log.info("[TradeConfiguration] Création d'un nouveau Trade avec ID : " + trade.getId() + ", compte : " + trade.getAccount() + ", type : " + trade.getType() + ", quantité d'achat : " + trade.getBuyQuantity() + ", action : " + trade.getAction());
-            return true;
+        Optional<Trade> existingTrade = tradeRepository.findById(trade.getId());
+        if (existingTrade.isPresent()) {
+            throw new TradeAlreadyExistsException("Un Trade avec le même ID existe déjà");
         }
-        throw new TradeAlreadyExistsException("Un Trade avec le même ID existe déjà");
+
+        tradeRepository.save(trade);
+        log.info("[TradeConfiguration] Création d'un nouveau Trade avec ID : " + trade.getId() + ", compte : " + trade.getAccount() + ", type : " + trade.getType() + ", quantité d'achat : " + trade.getBuyQuantity() + ", action : " + trade.getAction());
+        return true;
     }
 
     /**

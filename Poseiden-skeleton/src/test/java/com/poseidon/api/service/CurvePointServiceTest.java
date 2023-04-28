@@ -4,11 +4,12 @@ import com.poseidon.api.custom.exceptions.curve.CurvePointAlreadyExistsException
 import com.poseidon.api.custom.exceptions.curve.CurvePointNotFoundException;
 import com.poseidon.api.custom.exceptions.curve.InvalidCurvePointException;
 import com.poseidon.api.model.CurvePoint;
-import com.poseidon.api.repositories.CurvePointRepository;
+import com.poseidon.api.repository.CurvePointRepository;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -21,7 +22,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class CurvePointServiceTest {
 
     @InjectMocks
@@ -117,8 +118,6 @@ class CurvePointServiceTest {
         assertEquals(curvePointUpdated.getCurveId(), updatedCurvePoint.getCurveId());
         assertEquals(curvePointUpdated.getTerm(), updatedCurvePoint.getTerm());
         assertEquals(curvePointUpdated.getValue(), updatedCurvePoint.getValue());
-        assertEquals(curvePointUpdated.getAsOfDate(), updatedCurvePoint.getAsOfDate());
-        assertEquals(curvePointUpdated.getCreationDate(), updatedCurvePoint.getCreationDate());
     }
 
     @Test

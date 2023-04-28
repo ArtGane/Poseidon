@@ -4,7 +4,7 @@ import com.poseidon.api.custom.exceptions.curve.CurvePointAlreadyExistsException
 import com.poseidon.api.custom.exceptions.curve.CurvePointNotFoundException;
 import com.poseidon.api.custom.exceptions.curve.InvalidCurvePointException;
 import com.poseidon.api.model.CurvePoint;
-import com.poseidon.api.repositories.CurvePointRepository;
+import com.poseidon.api.repository.CurvePointRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -62,7 +62,7 @@ public class CurvePointService {
         if (id == null || curvePointEntityUpdated == null) {
             throw new IllegalArgumentException("L'ID et le CurvePoint ne peuvent pas être null");
         }
-        if (curvePointEntityUpdated.getCurveId() == null || curvePointEntityUpdated.getTerm() == null || curvePointEntityUpdated.getValue() == null || curvePointEntityUpdated.getAsOfDate() == null || curvePointEntityUpdated.getCreationDate() == null) {
+        if (curvePointEntityUpdated.getCurveId() == null || curvePointEntityUpdated.getTerm() == null || curvePointEntityUpdated.getValue() == null) {
             throw new InvalidCurvePointException("Le CurvePoint doit avoir tous les champs requis");
         }
         Optional<CurvePoint> curvePointOptional = curvePointRepository.findById(id);
@@ -71,8 +71,6 @@ public class CurvePointService {
             curvePoint.setCurveId(curvePointEntityUpdated.getCurveId());
             curvePoint.setTerm(curvePointEntityUpdated.getTerm());
             curvePoint.setValue(curvePointEntityUpdated.getValue());
-            curvePoint.setAsOfDate(curvePointEntityUpdated.getAsOfDate());
-            curvePoint.setCreationDate(curvePointEntityUpdated.getCreationDate());
             curvePointRepository.save(curvePoint);
             log.info("[CurveConfiguration] CurvePoint mis à jour " + curvePointEntityUpdated.getCurveId() + " avec la maturité " + curvePointEntityUpdated.getTerm() + " et la valeur " + curvePointEntityUpdated.getValue());
 

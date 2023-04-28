@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 
@@ -20,20 +21,24 @@ import java.time.LocalDateTime;
 public class CurvePoint {
 
     @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    Long id;
-    @Column(name = "curve_id")
-    Long curveId;
-    @Column(name = "term")
-    Double term;
-    @Column(name = "value")
-    Double value;
+    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(name = "as_of_Date", nullable = true)
+    @Column(name = "curve_id")
+    @NotNull(message = "must not be null")
+    private Long curveId;
+
+    @Column
+    private Double term;
+
+    @Column
+    private Double value;
+
+    @Column
     private LocalDateTime asOfDate;
 
-    @Column(name = "creation_date", nullable = true)
+    @Column
     private LocalDateTime creationDate;
 
 }

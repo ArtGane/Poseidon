@@ -1,16 +1,16 @@
 package com.poseidon.api.service;
 
 import com.poseidon.api.model.Rule;
-import com.poseidon.api.repositories.RuleRepository;
+import com.poseidon.api.repository.RuleRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.MessageSource;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
 
 import java.util.Locale;
 import java.util.Optional;
@@ -18,7 +18,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -26,7 +25,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class RuleServiceTest {
 
     @Mock
@@ -92,7 +91,6 @@ class RuleServiceTest {
     @Test
     public void testUpdateRuleSuccess() {
         setupForUpdateRules();
-        when(ruleNameRepository.findById(anyLong())).thenReturn(Optional.of(testRule));
 
         Rule updatedRule = new Rule();
         updatedRule.setName("Updated Test Rule");
@@ -157,7 +155,7 @@ class RuleServiceTest {
         Rule ruleToDelete = new Rule();
         ruleToDelete.setId(id);
 
-        when(ruleNameRepository.findRuleById(id)).thenReturn(Optional.of(ruleToDelete));
+        when(ruleNameRepository.findById(id)).thenReturn(Optional.of(ruleToDelete));
 
         boolean isDeleted = ruleService.deleteRule(id);
 
@@ -170,13 +168,13 @@ class RuleServiceTest {
     void testDeleteRuleWithNonExistingIdShouldThrowUsernameNotFoundException() {
         Long id = 1L;
 
-        when(ruleNameRepository.findRuleById(id)).thenReturn(Optional.empty());
+        when(ruleNameRepository.findById(id)).thenReturn(Optional.empty());
         when(messageSource.getMessage(eq("delete.rule.notfound"), eq(new Object[] {id}), any())).thenReturn("Règle non trouvée");
 
         UsernameNotFoundException exception = assertThrows(UsernameNotFoundException.class,
                 () -> ruleService.deleteRule(id));
         assertThat(exception.getMessage()).isEqualTo("Règle non trouvée");
-        verify(ruleNameRepository, times(1)).findRuleById(id);
+        verify(ruleNameRepository, times(1)).findById(id);
         verify(ruleNameRepository, never()).delete(any());
         verify(messageSource, times(1)).getMessage(eq("delete.rule.notfound"), eq(new Object[] {id}), any());
     }

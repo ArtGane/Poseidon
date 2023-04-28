@@ -1,14 +1,13 @@
 package com.poseidon.api.service;
 
 import com.poseidon.api.model.Rule;
-import com.poseidon.api.repositories.RuleRepository;
-import org.apache.commons.lang3.StringUtils;
+import com.poseidon.api.repository.RuleRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.Locale;
 import java.util.Optional;

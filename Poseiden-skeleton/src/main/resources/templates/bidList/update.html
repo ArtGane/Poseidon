@@ -13,7 +13,7 @@
 	</div>
 
 	<div class="row">
-		<form action="#" th:action="@{/bidList/update/{id}(id=${bidDto.id})}" th:object="${bid}" method="post" class="form-horizontal" style="width: 100%">
+		<form action="#" th:action="@{/bidList/update/{id}(id=${bid.get().id})}" th:object="${bid}" method="post" class="form-horizontal" style="width: 100%">
 			<div class="form-group">
 				<label class="col-2 control-label">Account</label>
 				<div class="col-10">

@@ -10,13 +10,20 @@
 <div class="container">
 	<div class="row">
 		<div class="col-6">
-
+			<a href="/bidList/list">Bid</a>&nbsp;|&nbsp;
+			<a href="/curvePoint/list">Curve Point</a>&nbsp;|&nbsp;
+			<a href="/rating/list">Rating</a>&nbsp;|&nbsp;
+			<a href="/trade/list">Trade</a>&nbsp;|&nbsp;
+			<a href="/ruleName/list">Rule</a>&nbsp;|&nbsp;
+			<a href="/user/list" th:if="${#authorization.expression('hasAuthority(''ADMIN'')')}">User</a>
 		</div>
 		<div class="col-6 text-right">
-			<a href="/">Home</a>&nbsp;|&nbsp;<a href="/login">Login</a>
+			<b th:inline="text" class="user"> [[${#httpServletRequest.remoteUser}]] </b>
+			<form th:action="@{/app-logout}" method="POST">
+				<input type="submit" value="Logout"/>
+			</form>
 		</div>
-	</div>
-	<div class="row"><h2>User List</h2></div>
+	</div>	<div class="row"><h2>User List</h2></div>
 	<div class="row">
 		<a href="/user/add" class="btn btn-primary btn-sm">Add New</a>
 		<table class="table table-bordered">

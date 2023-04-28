@@ -11,6 +11,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -38,6 +39,7 @@ public class User implements UserDetails {
     private String username;
 
     @Column
+    @NotBlank(message = "Password isn't a choice...")
     private String password;
 
     @Column

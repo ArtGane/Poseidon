@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" 
+<html xmlns="http://www.w3.org/1999/xhtml"
 	  xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="utf-8"/>
-<title>Home</title>
-<link rel="stylesheet" href="../../css/bootstrap.min.css" >
+	<meta charset="utf-8"/>
+	<title>Home</title>
+	<link rel="stylesheet" href="../../css/bootstrap.min.css" >
 </head>
 <body>
 <div class="container">
@@ -17,25 +17,30 @@
 		<form action="#" th:action="@{/trade/validate}" th:object="${trade}" method="post" class="form-horizontal"
 			  style="width: 100%">
 			<div class="form-group">
-				<label for="tradeName" class="col-sm-2 control-label">Trade Name</label>
+				<label for="account" class="col-sm-2 control-label">Account</label>
 				<div class="col-sm-10">
-					<input type="text" th:field="*{tradeName}" id="tradeName" placeholder="Trade Name"
-						   class="col-4">
+					<input type="text" th:field="*{account}" id="account" placeholder="Account" class="col-4">
 				</div>
 			</div>
 
 			<div class="form-group">
-				<label for="tradeValue" class="col-sm-2 control-label">Trade Value</label>
+				<label for="type" class="col-sm-2 control-label">Type</label>
 				<div class="col-sm-10">
-					<input type="text" th:field="*{tradeValue}" id="tradeValue" placeholder="Trade Value"
-						   class="col-4">
+					<input type="text" th:field="*{type}" id="type" placeholder="Type" class="col-4">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label for="action" class="col-sm-2 control-label">Action</label>
+				<div class="col-sm-10">
+					<input type="text" th:field="*{action}" id="action" placeholder="Action" class="col-4">
 				</div>
 			</div>
 
 			<div class="form-group">
 				<div class="col-sm-12">
 					<a class="btn btn-danger btn-sm" href="/trade/list">Cancel</a>
-					<input class="btn btn-primary btn-sm" type="submit" value="Save data">
+					<input class="btn btn-primary btn-sm" type="submit" value="Create">
 				</div>
 			</div>
 		</form>

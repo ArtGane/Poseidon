@@ -40,7 +40,7 @@ public class CurvePointService {
             throw new InvalidCurvePointException("Les valeurs de term et de valeur doivent être positives");
         }
 
-        if (!curvePointRepository.findById(curvePoint.getId()).isPresent()) {
+        if (!curvePointRepository.findAll().contains(curvePoint)) {
             curvePointRepository.save(curvePoint);
             log.info("[CurveConfiguration] Création d'un nouveau CurvePoint avec ID : " + curvePoint.getCurveId() + ", terme : " + curvePoint.getTerm() + " et valeur : " + curvePoint.getValue());
             return true;

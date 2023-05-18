@@ -33,16 +33,11 @@ public class TradeService {
             throw new IllegalArgumentException("Le Trade ne peut pas être nul");
         }
 
-        if (trade.getAccount() == null || trade.getType() == null || trade.getBuyQuantity() == null || trade.getAction() == null) {
+        if (trade.getAccount() == null || trade.getType() == null || trade.getAction() == null) {
             throw new InvalidTradeException("Le Trade doit avoir tous les champs requis");
         }
 
-        if (trade.getBuyQuantity() < 0) {
-            throw new InvalidTradeException("La quantité d'achat doit être positive");
-        }
-
-        Optional<Trade> existingTrade = tradeRepository.findById(trade.getId());
-        if (existingTrade.isPresent()) {
+        if (tradeRepository.findAll().contains(trade)) {
             throw new TradeAlreadyExistsException("Un Trade avec le même ID existe déjà");
         }
 

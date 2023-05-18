@@ -25,7 +25,7 @@ public class RatingService {
      */
     public boolean createRating(Rating rating) {
         try {
-            if (rating != null && !ratingRepository.findById(rating.getId()).isPresent()) {
+            if (rating != null && !ratingRepository.findAll().contains(rating)) {
                 ratingRepository.save(rating);
                 log.info("[RatingConfiguration] Création d'un nouveau rating avec l'ID " + rating.getId() + " pour le numéro de commande " + rating.getOrderNumber());
                 return true;

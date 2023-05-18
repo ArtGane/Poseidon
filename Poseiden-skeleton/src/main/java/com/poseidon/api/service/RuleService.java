@@ -40,25 +40,12 @@ public class RuleService {
         if (StringUtils.isEmpty(ruleEntity.getDescription())) {
             throw new IllegalArgumentException(messageSource.getMessage("create.rule.description.null", null, Locale.getDefault()));
         }
-        if (StringUtils.isEmpty(ruleEntity.getJson())) {
-            throw new IllegalArgumentException(messageSource.getMessage("create.rule.json.null", null, Locale.getDefault()));
-        }
-        if (StringUtils.isEmpty(ruleEntity.getTemplate())) {
-            throw new IllegalArgumentException(messageSource.getMessage("create.rule.template.null", null, Locale.getDefault()));
-        }
-        if (StringUtils.isEmpty(ruleEntity.getSqlStr())) {
-            throw new IllegalArgumentException(messageSource.getMessage("create.rule.sqlstr.null", null, Locale.getDefault()));
-        }
-        if (StringUtils.isEmpty(ruleEntity.getSqlPart())) {
-            throw new IllegalArgumentException(messageSource.getMessage("create.rule.sqlpart.null", null, Locale.getDefault()));
-        }
-        if (!ruleNameRepository.findById(ruleEntity.getId()).isPresent()) {
+        if (!ruleNameRepository.findAll().contains(ruleEntity)) {
             ruleNameRepository.save(ruleEntity);
             log.info(messageSource.getMessage("create.rule.success", new Object[] {ruleEntity.getId(), ruleEntity.getName()}, Locale.getDefault()));
             return true;
         }
         throw new UsernameNotFoundException(messageSource.getMessage("create.rule.id.exist", null, Locale.getDefault()));
-
     }
 
     /**

@@ -27,17 +27,17 @@ public class BidService {
      * @throws IllegalArgumentException si l'objet Bid est null ou s'il existe déjà une entrée avec le même id
      */
     public void createBid(Bid bid) throws InvalidBidException, BidAlreadyExistsException {
-        if (bid == null) {
-            throw new IllegalArgumentException("L'objet Bid ne peut pas être nul");
-        }
-        if (bidRepository.findById(bid.getId()).isPresent()) {
-            throw new BidAlreadyExistsException("Un objet Bid avec le même ID existe déjà");
-        }
         if (bid.getAccount() == null || bid.getType() == null || bid.getBidQuantity() == null) {
             throw new InvalidBidException("L'objet Bid doit avoir tous les champs requis");
         }
         if (bid.getBidQuantity() < 0) {
             throw new InvalidBidException("La valeur de bidQuantity doit être positive");
+        }
+        if (bidRepository.findAll().contains(bid)) {
+            throw new BidAlreadyExistsException("Un objet Bid avec le même ID existe déjà");
+        }
+        if (bid == null) {
+            throw new IllegalArgumentException("L'objet Bid ne peut pas être nul");
         }
         bidRepository.save(bid);
         log.info("[BidConfiguration] Nouveau Bid créé pour le compte : " + bid.getAccount() + " quantité : " + bid.getBidQuantity());

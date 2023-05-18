@@ -12,10 +12,7 @@ import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
@@ -44,7 +41,7 @@ public class BidController {
     }
 
     @PostMapping("/bidList/validate")
-    public String createBid(@Valid Bid bid, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) throws BidAlreadyExistsException {
+    public String createBid(@Valid Bid bid, BindingResult bindingResult, RedirectAttributes redirectAttributes) throws BidAlreadyExistsException {
         if (bindingResult.hasErrors()) {
             return "bidList/add";
         }
